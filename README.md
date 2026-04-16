@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![NLP](https://img.shields.io/badge/NLP-Transformers-green)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
 # YouTube Depression Signal Detection
 
 > Investigating whether video-level contextual framing moderates depression-indicative linguistic patterns in YouTube comments.
