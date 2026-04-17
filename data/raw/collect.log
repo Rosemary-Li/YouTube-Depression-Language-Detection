@@ -1,0 +1,516 @@
+2026-04-17 13:13:23,548  INFO  =================================================================
+2026-04-17 13:13:23,548  INFO  YouTube Depression Signal — collect.py
+2026-04-17 13:13:23,548  INFO  Categories: Mental Health, Fitness / Wellness, Music / Entertainment, News / Current Events, Personal Vlog
+2026-04-17 13:13:23,548  INFO  Target: 50 videos/category × 50 comments/video = ~12500 comments
+2026-04-17 13:13:23,548  INFO  =================================================================
+2026-04-17 13:13:23,549  INFO  New quota day: 2026-04-17 — resetting counter.
+2026-04-17 13:13:23,555  INFO  Phase 1 | Mental Health             target=50, have=0
+2026-04-17 13:13:23,555  INFO  Phase1 search 'mental health vlog' (Mental Health) | quota used: 0
+2026-04-17 13:13:27,147  INFO    query='mental health vlog' got 50 (total 50)
+2026-04-17 13:13:27,148  INFO  Phase 1 | Mental Health             done — 50 IDs
+2026-04-17 13:13:27,148  INFO  Phase 1 | Fitness / Wellness        target=50, have=0
+2026-04-17 13:13:27,149  INFO  Phase1 search 'workout routine' (Fitness / Wellness) | quota used: 100
+2026-04-17 13:13:30,784  INFO    query='workout routine' got 50 (total 50)
+2026-04-17 13:13:30,787  INFO  Phase 1 | Fitness / Wellness        done — 50 IDs
+2026-04-17 13:13:30,787  INFO  Phase 1 | Music / Entertainment     target=50, have=0
+2026-04-17 13:13:30,787  INFO  Phase1 chart Music / Entertainment | quota used: 200
+2026-04-17 13:13:33,898  INFO    got 30 (total 30)
+2026-04-17 13:13:33,901  INFO  Phase 1 | Music / Entertainment     done — 30 IDs
+2026-04-17 13:13:33,901  INFO  Phase 1 | News / Current Events     target=50, have=0
+2026-04-17 13:13:33,901  INFO  Phase1 chart News / Current Events | quota used: 201
+2026-04-17 13:13:37,017  INFO    got 50 (total 50)
+2026-04-17 13:13:37,020  INFO  Phase 1 | News / Current Events     done — 50 IDs
+2026-04-17 13:13:37,020  INFO  Phase 1 | Personal Vlog             target=50, have=0
+2026-04-17 13:13:37,020  INFO  Phase1 search 'day in my life vlog' (Personal Vlog) | quota used: 202
+2026-04-17 13:13:40,631  INFO    query='day in my life vlog' got 50 (total 50)
+2026-04-17 13:13:40,634  INFO  Phase 1 | Personal Vlog             done — 50 IDs
+2026-04-17 13:13:40,634  INFO  Phase 1 complete.
+2026-04-17 13:13:40,640  INFO  Phase 2 | fetching metadata for 230 videos (0 already done)
+2026-04-17 13:13:40,640  INFO  Phase2 batch 1/5 | quota used: 302
+2026-04-17 13:13:43,832  INFO  Phase2 batch 2/5 | quota used: 303
+2026-04-17 13:13:46,996  INFO  Phase2 batch 3/5 | quota used: 304
+2026-04-17 13:13:50,172  INFO  Phase2 batch 4/5 | quota used: 305
+2026-04-17 13:13:53,335  INFO  Phase2 batch 5/5 | quota used: 306
+2026-04-17 13:13:56,538  INFO  Phase 2 complete. 230 videos written to /Users/rosemary/Desktop/yt-depression-signals/data/raw/videos.json
+2026-04-17 13:13:56,538  INFO    Fitness / Wellness             50 videos
+2026-04-17 13:13:56,538  INFO    Mental Health                  50 videos
+2026-04-17 13:13:56,538  INFO    News / Current Events          50 videos
+2026-04-17 13:13:56,538  INFO    Personal Vlog                  50 videos
+2026-04-17 13:13:56,538  INFO    Music / Entertainment          30 videos
+2026-04-17 13:13:56,541  INFO  Phase 3 | collecting top-50 comments for 230 videos (0 already done)
+2026-04-17 13:13:56,541  INFO  Phase3 Mental Health | Ii53BtHLnGk | quota used: 307
+2026-04-17 13:14:00,015  INFO    +50 comments | video: This Is How Depression Feels
+2026-04-17 13:14:00,027  INFO  Phase3 Mental Health | 1XCpuN3SYc0 | quota used: 308
+2026-04-17 13:14:03,430  INFO    +50 comments | video: Opening Up About Our Mental Health.
+2026-04-17 13:14:03,444  INFO  Phase3 Mental Health | qukxPP4kG2g | quota used: 309
+2026-04-17 13:14:06,949  INFO    +50 comments | video: How Changing My Diet Transformed My Mental Health #gluc
+2026-04-17 13:14:06,960  INFO  Phase3 Mental Health | IDPDEKtd2yM | quota used: 310
+2026-04-17 13:14:10,331  INFO    +50 comments | video: "I'm Fine" - Learning To Live With Depression | Jake Ty
+2026-04-17 13:14:10,344  INFO  Phase3 Mental Health | alTnHBuCr-4 | quota used: 311
+2026-04-17 13:14:13,726  INFO    +50 comments | video: How to take a Depression Bath! #depressionrelief #depre
+2026-04-17 13:14:13,739  INFO  Phase3 Mental Health | VpyBu_k_iZA | quota used: 312
+2026-04-17 13:14:17,188  INFO    +50 comments | video: Schizophrenia! #schizophrenia #medicine #doctorexplains
+2026-04-17 13:14:17,200  INFO  Phase3 Mental Health | JEenxe4EBTs | quota used: 313
+2026-04-17 13:14:20,678  INFO    +50 comments | video: How to spot a paranoid schizophrenic
+2026-04-17 13:14:20,692  INFO  Phase3 Mental Health | K5YxtEXQE5U | quota used: 314
+2026-04-17 13:14:24,163  INFO    +50 comments | video: Covington officer's bodycam footage of teen dropped off
+2026-04-17 13:14:24,173  INFO  Phase3 Mental Health | 22CZdj4L8Sk | quota used: 315
+2026-04-17 13:14:27,532  INFO    +50 comments | video: let's get personal… mental health, sexuality, and love
+2026-04-17 13:14:27,544  INFO  Phase3 Mental Health | 8I5YRsBcdH8 | quota used: 316
+2026-04-17 13:14:30,913  INFO    +50 comments | video: Mental Health Awareness Month - Suicide Awareness Video
+2026-04-17 13:14:30,926  INFO  Phase3 Mental Health | fEarnr8L24c | quota used: 317
+2026-04-17 13:14:34,392  INFO    +50 comments | video: 5 Tips To Help With Laziness 🤍
+2026-04-17 13:14:34,402  INFO  Phase3 Mental Health | 5bNI_NloNa8 | quota used: 318
+2026-04-17 13:14:37,757  INFO    +50 comments | video: 10 Signs Your Mental Health is Getting Worse
+2026-04-17 13:14:37,767  INFO  Phase3 Mental Health | 7-iNOFD27G4 | quota used: 319
+2026-04-17 13:14:41,256  INFO    +50 comments | video: Dealing with Panic Attacks & Anxiety | Zoella
+2026-04-17 13:14:41,268  INFO  Phase3 Mental Health | ca9tHTUK9z8 | quota used: 320
+2026-04-17 13:14:44,508  INFO    +50 comments | video: SELF CARE VLOG: journal routine, mental health, hair ca
+2026-04-17 13:14:44,531  INFO  Phase3 Mental Health | HX19-PHEkkE | quota used: 321
+2026-04-17 13:14:47,857  INFO    +50 comments | video: My Mental Health Story | My Journey #1MinDrama Episode 
+2026-04-17 13:14:47,869  INFO  Phase3 Mental Health | -GRjTREdfQw | quota used: 322
+2026-04-17 13:14:51,206  INFO    +50 comments | video: Try this if you’re neurodivergent!🧠  #awareness #disabi
+2026-04-17 13:14:51,223  INFO  Phase3 Mental Health | rU8APAwp6io | quota used: 323
+2026-04-17 13:14:54,750  INFO    +50 comments | video: what to do when you feel like doing nothing (unmotivate
+2026-04-17 13:14:54,762  INFO  Phase3 Mental Health | UsX_PurzFh8 | quota used: 324
+2026-04-17 13:14:58,149  INFO    +50 comments | video: I skipped school to have a mental health day
+2026-04-17 13:14:58,162  INFO  Phase3 Mental Health | gKC_N_9aJ8o | quota used: 325
+2026-04-17 13:15:01,732  INFO    +50 comments | video: Alyssa's 5 Mental Health Disorders (The Truth About our
+2026-04-17 13:15:01,744  INFO  Phase3 Mental Health | -hCAukcQJgg | quota used: 326
+2026-04-17 13:15:05,116  INFO    +50 comments | video: POV: you asked your mom for a mental health day
+2026-04-17 13:15:05,128  INFO  Phase3 Mental Health | gAOmud-IoxQ | quota used: 327
+2026-04-17 13:15:08,593  INFO    +50 comments | video: how to study when you are struggling with mental health
+2026-04-17 13:15:08,609  INFO  Phase3 Mental Health | -XfeLUWgp5w | quota used: 328
+2026-04-17 13:15:12,250  INFO    +50 comments | video: Day in the life of a psyc ward patient
+2026-04-17 13:15:12,261  INFO  Phase3 Mental Health | tM_6SiFPUEg | quota used: 329
+2026-04-17 13:15:15,874  INFO    +50 comments | video: The Side Effects of Being Human - ASMR Supportive Frien
+2026-04-17 13:15:15,886  INFO  Phase3 Mental Health | hBzP8MtJf04 | quota used: 330
+2026-04-17 13:15:19,345  INFO    +50 comments | video: a video to watch when you're sad.
+2026-04-17 13:15:19,356  INFO  Phase3 Mental Health | 6kDH53JyHes | quota used: 331
+2026-04-17 13:15:22,828  INFO    +50 comments | video: Challenging fear foods in anorexia recovery | Veronica 
+2026-04-17 13:15:22,839  INFO  Phase3 Mental Health | egDdGpiRv9I | quota used: 332
+2026-04-17 13:15:26,206  INFO    +50 comments | video: When You Have Thoughts Of Hurting Yourself, What Happen
+2026-04-17 13:15:26,216  INFO  Phase3 Mental Health | pVL3ZwVp4bg | quota used: 333
+2026-04-17 13:15:29,468  INFO    +50 comments | video: Harper’s Mental Health!
+2026-04-17 13:15:29,478  INFO  Phase3 Mental Health | wp_k5wVn1Gs | quota used: 334
+2026-04-17 13:15:32,864  INFO    +50 comments | video: My 5 Unconventional Healthy Habits
+2026-04-17 13:15:32,876  INFO  Phase3 Mental Health | 46Sgv2a0YCY | quota used: 335
+2026-04-17 13:15:36,234  INFO    +50 comments | video: I have a severe mental illness… do I live alone?
+2026-04-17 13:15:36,245  INFO  Phase3 Mental Health | xAlV1hsdPB4 | quota used: 336
+2026-04-17 13:15:39,620  INFO    +50 comments | video: Perks of going to the Psych Ward
+2026-04-17 13:15:39,628  INFO  Phase3 Mental Health | qCKH5fUvsPI | quota used: 337
+2026-04-17 13:15:43,176  INFO    +50 comments | video: the desire to be sad: "tragically beautiful" art & roma
+2026-04-17 13:15:43,186  INFO  Phase3 Mental Health | bsKOqkK6mbI | quota used: 338
+2026-04-17 13:15:46,453  INFO    +50 comments | video: My Float Therapy Experience
+2026-04-17 13:15:46,469  INFO  Phase3 Mental Health | Hh4GSzW2VVc | quota used: 339
+2026-04-17 13:15:49,758  INFO    +50 comments | video: Mental health day for sis 🩶 #MomVlogs | Single Mom DITL
+2026-04-17 13:15:49,767  INFO  Phase3 Mental Health | wgfydORhcHI | quota used: 340
+2026-04-17 13:15:53,147  INFO    +50 comments | video: My Story | Battling Mental Illness
+2026-04-17 13:15:53,156  INFO  Phase3 Mental Health | YRMOtFPLf_E | quota used: 341
+2026-04-17 13:15:56,482  INFO    +50 comments | video: cleaning my depression room and taking care of myself [
+2026-04-17 13:15:56,495  INFO  Phase3 Mental Health | x0nZ1ZLephQ | quota used: 342
+2026-04-17 13:15:59,861  INFO    +50 comments | video: Meditation For Mental Balance and Grounding
+2026-04-17 13:15:59,864  INFO  Phase3 Mental Health | Al3Y9WZ1fFU | quota used: 343
+2026-04-17 13:16:03,380  INFO    +50 comments | video: I bet you $1,000,000 this makes you smile
+2026-04-17 13:16:03,393  INFO  Phase3 Mental Health | gNTfzfobE4s | quota used: 344
+2026-04-17 13:16:06,859  INFO    +50 comments | video: ✨A DAY IN THE LIFE✨ #bipolar #vlog #mania
+2026-04-17 13:16:06,874  INFO  Phase3 Mental Health | DzAcsXaj-eU | quota used: 345
+2026-04-17 13:16:10,239  INFO    +49 comments | video: Things in a psych ward that just make sense
+2026-04-17 13:16:10,245  INFO  Phase3 Mental Health | 1CqMGUvKNJI | quota used: 346
+2026-04-17 13:16:13,620  INFO    +50 comments | video: Panic attack help. Full video with tips on my page #men
+2026-04-17 13:16:13,634  INFO  Phase3 Mental Health | W6jKUMTlfW4 | quota used: 347
+2026-04-17 13:16:16,981  INFO    +50 comments | video: This is what a day looks like for me rn. #dayinthelife 
+2026-04-17 13:16:16,992  INFO  Phase3 Mental Health | Anu1AoD-9NY | quota used: 348
+2026-04-17 13:16:20,481  INFO    +50 comments | video: RUNNING EVERYDAY FOR A YEAR *results*
+2026-04-17 13:16:20,494  INFO  Phase3 Mental Health | KsfsxNF9ltc | quota used: 349
+2026-04-17 13:16:23,866  INFO    +50 comments | video: A Day in My Life as a Psych Ward Hospital Patient | VLO
+2026-04-17 13:16:23,895  INFO  Phase3 Mental Health | 8-2WQF3SWwo | quota used: 350
+2026-04-17 13:16:27,344  INFO    +50 comments | video: LIVE Cognitive Behavioral Therapy Session
+2026-04-17 13:16:27,356  INFO  Phase3 Mental Health | euOpyenYVrM | quota used: 351
+2026-04-17 13:16:30,923  INFO    +50 comments | video: Things in a psych ward that just make sense Pt. 2
+2026-04-17 13:16:30,934  INFO  Phase3 Mental Health | tiskuoYD90w | quota used: 352
+2026-04-17 13:16:34,414  INFO    +50 comments | video: 24 Hours After I left My Toxic Korean Family pt.3
+2026-04-17 13:16:34,423  INFO  Phase3 Mental Health | sQ34NySXEhY | quota used: 353
+2026-04-17 13:16:37,901  INFO    +50 comments | video: 3 months of depression, documented
+2026-04-17 13:16:37,912  INFO  Phase3 Mental Health | 1Apzbky5wug | quota used: 354
+2026-04-17 13:16:41,369  INFO    +50 comments | video: #pov a teenager living with a mental health disorder… #
+2026-04-17 13:16:41,382  INFO  Phase3 Mental Health | -hKy6yYfbDI | quota used: 355
+2026-04-17 13:16:44,749  INFO    +50 comments | video: What depression can look like
+2026-04-17 13:16:44,762  INFO  Phase3 Mental Health | tPTjhjFO_ss | quota used: 356
+2026-04-17 13:16:48,232  INFO    +50 comments | video: Day in the Life of a Psychology Major
+2026-04-17 13:16:48,245  INFO  Phase3 Fitness / Wellness | -p0PA9Zt8zk | quota used: 357
+2026-04-17 13:16:51,609  INFO    +50 comments | video: Do This Warm Up Before Your Workouts | Quick Warm Up Ro
+2026-04-17 13:16:51,622  INFO  Phase3 Fitness / Wellness | NQmnJtB1gzo | quota used: 358
+2026-04-17 13:16:55,198  INFO    +50 comments | video: 30 Min Full Body Workout to BURN FAT & GET ABS + Toned 
+2026-04-17 13:16:55,206  INFO  Phase3 Fitness / Wellness | Ta8_ASDu9yk | quota used: 359
+2026-04-17 13:16:58,578  INFO    +50 comments | video: 10 MIN PERFECT ABS WORKOUT (RESULTS GUARANTEED!)
+2026-04-17 13:16:58,589  INFO  Phase3 Fitness / Wellness | A3XSoedsH7Y | quota used: 360
+2026-04-17 13:17:01,955  INFO    +50 comments | video: The Workout Program you didn’t know you needed! #shorts
+2026-04-17 13:17:01,967  INFO  Phase3 Fitness / Wellness | AldMMpZTejY | quota used: 361
+2026-04-17 13:17:05,332  INFO    +50 comments | video: Routine for flexibility now in my bio ✅ #challenge #yog
+2026-04-17 13:17:05,346  INFO  Phase3 Fitness / Wellness | Y08OkdVO4Co | quota used: 362
+2026-04-17 13:17:08,711  INFO    +50 comments | video: 20 Minute Full Body Workout At Home - No Equipment
+2026-04-17 13:17:08,722  INFO  Phase3 Fitness / Wellness | fuPV5GwmqV0 | quota used: 363
+2026-04-17 13:17:12,115  INFO    +50 comments | video: DAY 13 of my 30 day fat loss journey
+2026-04-17 13:17:12,127  INFO  Phase3 Fitness / Wellness | 7HF92d0X3Jc | quota used: 364
+2026-04-17 13:17:15,679  INFO    +50 comments | video: 7MIN TINY WAIST & ABS WORKOUT// FLAT STOMACH AND SNATCH
+2026-04-17 13:17:15,692  INFO  Phase3 Fitness / Wellness | Tl3ue_d4Y6g | quota used: 365
+2026-04-17 13:17:19,157  INFO    +50 comments | video: Beginner Workout Routine for Students
+2026-04-17 13:17:19,171  INFO  Phase3 Fitness / Wellness | AzV3EA-1-yM | quota used: 366
+2026-04-17 13:17:22,554  INFO    +50 comments | video: 20 Min Full Body Workout Routine for Beginners (Follow 
+2026-04-17 13:17:22,566  INFO  Phase3 Fitness / Wellness | fQJ0eiKEjQ8 | quota used: 367
+2026-04-17 13:17:25,919  INFO    +50 comments | video: it's not about being extreme, it's about being healthy,
+2026-04-17 13:17:25,932  INFO  Phase3 Fitness / Wellness | 7KSNmziMqog | quota used: 368
+2026-04-17 13:17:29,499  INFO    +50 comments | video: 10 MINUTE FAT BURNING MORNING ROUTINE | Do this every d
+2026-04-17 13:17:29,512  INFO  Phase3 Fitness / Wellness | 9o-BQS9qjPA | quota used: 369
+2026-04-17 13:17:32,982  INFO    +50 comments | video: Miley Cyrus doing the Hemsworths workout routine in Flo
+2026-04-17 13:17:32,995  INFO  Phase3 Fitness / Wellness | GPbuWUktZc4 | quota used: 370
+2026-04-17 13:17:36,360  INFO    +50 comments | video: My Workout Schedule 📅💫
+2026-04-17 13:17:36,375  INFO  Phase3 Fitness / Wellness | nKedwx7hcZQ | quota used: 371
+2026-04-17 13:17:39,742  INFO    +50 comments | video: Rating ICE Spice workout routine! #Icespice #fitness
+2026-04-17 13:17:39,752  INFO  Phase3 Fitness / Wellness | 07Ho3chffoA | quota used: 372
+2026-04-17 13:17:43,093  INFO    +50 comments | video: Joe Rogan’s Insane Workout Routine
+2026-04-17 13:17:43,106  INFO  Phase3 Fitness / Wellness | UswHz7_nvZQ | quota used: 373
+2026-04-17 13:17:46,606  INFO    +50 comments | video: 10 phút TẬP BỤNG đơn giản TẠI NHÀ | Abs Workout Routine
+2026-04-17 13:17:46,619  INFO  Phase3 Fitness / Wellness | 5RtVbWCX5y0 | quota used: 374
+2026-04-17 13:17:49,978  INFO    +50 comments | video: Which Workout Split Is Actually Best? (Science-Based)
+2026-04-17 13:17:49,984  INFO  Phase3 Fitness / Wellness | HP1Vfk6oI2s | quota used: 375
+2026-04-17 13:17:53,364  INFO    +50 comments | video: My post workout routine 🥰💪🏻 #momblogger #babygirl #heal
+2026-04-17 13:17:53,376  INFO  Phase3 Fitness / Wellness | IswoUe3G3G0 | quota used: 376
+2026-04-17 13:17:56,716  INFO    +50 comments | video: Morning routine 🦍#ankitbaiyanpuria  #workout #fitness #
+2026-04-17 13:17:56,730  INFO  Phase3 Fitness / Wellness | dCavZetcTJY | quota used: 377
+2026-04-17 13:18:00,182  INFO    +50 comments | video: How I train 7 days per week | My Training Split
+2026-04-17 13:18:00,197  INFO  Phase3 Fitness / Wellness | IFE1VT-iuZs | quota used: 378
+2026-04-17 13:18:03,601  INFO    +50 comments | video: 🔥 하루 딱 10분! 11자 복근 보장 운동 루틴 | Abs Workout
+2026-04-17 13:18:03,610  INFO  Phase3 Fitness / Wellness | o9zCgPtsups | quota used: 379
+2026-04-17 13:18:06,930  INFO    +49 comments | video: How To Train For Mass | Arnold Schwarzenegger's Bluepri
+2026-04-17 13:18:06,942  INFO  Phase3 Fitness / Wellness | 66iSdDPlBBc | quota used: 380
+2026-04-17 13:18:10,254  INFO    +50 comments | video: Slim Your Belly Fast: 4-Minute Home Workout Routine (No
+2026-04-17 13:18:10,263  INFO  Phase3 Fitness / Wellness | 09wcXpjYlmQ | quota used: 381
+2026-04-17 13:18:13,604  INFO    +50 comments | video: How did we do on this transition? 🤩 #gymmotivation #gym
+2026-04-17 13:18:13,622  INFO  Phase3 Fitness / Wellness | PY6DrbX4W4o | quota used: 382
+2026-04-17 13:18:17,013  INFO    +50 comments | video: Full Week Gym Workout Plan | Week Schedule For Gym Work
+2026-04-17 13:18:17,026  INFO  Phase3 Fitness / Wellness | czkGj5vJEFQ | quota used: 383
+2026-04-17 13:18:20,395  INFO    +50 comments | video: My New Science-Based Full Body Workout For Pure Bodybui
+2026-04-17 13:18:20,407  INFO  Phase3 Fitness / Wellness | 6sbjg5fcKJ4 | quota used: 384
+2026-04-17 13:18:23,774  INFO    +50 comments | video: HOW TO GET SHREDDED FOR SUMMER FAST
+2026-04-17 13:18:23,786  INFO  Phase3 Fitness / Wellness | qBn-UF1UrBU | quota used: 385
+2026-04-17 13:18:27,254  INFO    +50 comments | video: 14 Days Weight Loss Challenge - Home Workout Routine | 
+2026-04-17 13:18:27,265  INFO  Phase3 Fitness / Wellness | qVek72z3F1U | quota used: 386
+2026-04-17 13:18:30,738  INFO    +50 comments | video: The Smartest Push Pull Legs Routine (Fully Explained)
+2026-04-17 13:18:30,750  INFO  Phase3 Fitness / Wellness | R4R8Zt-Hmtw | quota used: 387
+2026-04-17 13:18:34,216  INFO    +50 comments | video: the day after an intense workout..
+2026-04-17 13:18:34,230  INFO  Phase3 Fitness / Wellness | LUrrN6cEBRQ | quota used: 388
+2026-04-17 13:18:37,533  INFO    +50 comments | video: 30 Min Fat Burning Cardio Workout - Bipasha Basu Unleas
+2026-04-17 13:18:37,545  INFO  Phase3 Fitness / Wellness | 8uUawnM-FD8 | quota used: 389
+2026-04-17 13:18:40,620  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:18:40,622  INFO    Comments disabled — 8uUawnM-FD8, skipping.
+2026-04-17 13:18:40,632  INFO  Phase3 Fitness / Wellness | m4ox6KiqMfY | quota used: 389
+2026-04-17 13:18:43,993  INFO    +50 comments | video: kazuha's COMPLETE 7 minute ab workout
+2026-04-17 13:18:44,007  INFO  Phase3 Fitness / Wellness | ZVc6bwxuU7I | quota used: 390
+2026-04-17 13:18:47,427  INFO    +50 comments | video: World‘s Most Shredded Kid‘s Workout Routine
+2026-04-17 13:18:47,441  INFO  Phase3 Fitness / Wellness | U0bhE67HuDY | quota used: 391
+2026-04-17 13:18:50,831  INFO    +50 comments | video: 15 Minute Beginner Weight Training - Easy Exercises - H
+2026-04-17 13:18:50,841  INFO  Phase3 Fitness / Wellness | ZveSMkUr0l0 | quota used: 392
+2026-04-17 13:18:54,296  INFO    +50 comments | video: BEST 10 min Lower Abs Workout Routine | Lose Lower Bell
+2026-04-17 13:18:54,308  INFO  Phase3 Fitness / Wellness | IT94xC35u6k | quota used: 393
+2026-04-17 13:18:57,738  INFO    +50 comments | video: 20 min Fat Burning Workout for TOTAL BEGINNERS (Achieva
+2026-04-17 13:18:57,749  INFO  Phase3 Fitness / Wellness | sETqHpTSqKg | quota used: 394
+2026-04-17 13:19:01,467  INFO    +50 comments | video: My abs+SMALLER waist ⌛HOURGLASS beginner workout routin
+2026-04-17 13:19:01,491  INFO  Phase3 Fitness / Wellness | u30ElgGF8yk | quota used: 395
+2026-04-17 13:19:05,040  INFO    +50 comments | video: Intense Abs Workout Routine - 10 Mins Flat Stomach Exer
+2026-04-17 13:19:05,050  INFO  Phase3 Fitness / Wellness | WjuUmsoF57I | quota used: 396
+2026-04-17 13:19:08,429  INFO    +50 comments | video: Jake Gyllenhaal's Workout To Get His Ridiculous Road Ho
+2026-04-17 13:19:08,442  INFO  Phase3 Fitness / Wellness | ylT16QB6Uig | quota used: 397
+2026-04-17 13:19:11,677  INFO    +50 comments | video: Kanye West - The New Workout Plan (Long Version)
+2026-04-17 13:19:11,685  INFO  Phase3 Fitness / Wellness | UqFzWx8X5AM | quota used: 398
+2026-04-17 13:19:15,082  INFO    +50 comments | video: My Fat Burning GYM Routine (Treadmill Interval Running)
+2026-04-17 13:19:15,096  INFO  Phase3 Fitness / Wellness | LhL5SNZfnQs | quota used: 399
+2026-04-17 13:19:18,463  INFO    +50 comments | video: 14 Days Weight Loss Challenge - Home Workout Routine
+2026-04-17 13:19:18,474  INFO  Phase3 Fitness / Wellness | 4ZhtK0vM8tA | quota used: 400
+2026-04-17 13:19:21,962  INFO    +50 comments | video: BEGINNER WORKOUT ROUTINE MADE SIMPLE (home or gym)
+2026-04-17 13:19:21,972  INFO  Phase3 Fitness / Wellness | aGUE4AsE6KY | quota used: 401
+2026-04-17 13:19:25,034  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:19:25,036  INFO    Comments disabled — aGUE4AsE6KY, skipping.
+2026-04-17 13:19:25,053  INFO  Phase3 Fitness / Wellness | Xdz99XJyU_Y | quota used: 401
+2026-04-17 13:19:28,490  INFO    +50 comments | video: Joe Rogan's Full Workout Routine💪🔥
+2026-04-17 13:19:28,501  INFO  Phase3 Fitness / Wellness | cbKkB3POqaY | quota used: 402
+2026-04-17 13:19:31,764  INFO    +50 comments | video: 25 MIN FULL BODY HIIT for Beginners - No Equipment - No
+2026-04-17 13:19:31,774  INFO  Phase3 Fitness / Wellness | eTxO5ZMxcsc | quota used: 403
+2026-04-17 13:19:35,147  INFO    +50 comments | video: Full Body 5x Per Week: Why High Frequency Training Is S
+2026-04-17 13:19:35,161  INFO  Phase3 Fitness / Wellness | VecbXgWY0DI | quota used: 404
+2026-04-17 13:19:38,498  INFO    +50 comments | video: WARM UP ROUTINE BEFORE WORKOUT | Quick and Effective | 
+2026-04-17 13:19:38,510  INFO  Phase3 Music / Entertainment | Vn5ohnD0Jns | quota used: 405
+2026-04-17 13:19:41,904  INFO    +50 comments | video: Allstar JR - Expensive Wristwatches
+2026-04-17 13:19:41,915  INFO  Phase3 Music / Entertainment | nw443G62EQc | quota used: 406
+2026-04-17 13:19:45,390  INFO    +50 comments | video: TEDDY AFRO  - ስምምነን (ጉሬጌ) - Sememene (GuReggae) | Track
+2026-04-17 13:19:45,401  INFO  Phase3 Music / Entertainment | 7gKpREE5Z3w | quota used: 407
+2026-04-17 13:19:48,675  INFO    +50 comments | video: DJ Khaled, Future, Lil Baby - One of Them (Official Mus
+2026-04-17 13:19:48,686  INFO  Phase3 Music / Entertainment | 88rVYJm4ls8 | quota used: 408
+2026-04-17 13:19:51,859  INFO    +12 comments | video: Moy Bobadilla - Tus Mentiras (Letra)
+2026-04-17 13:19:51,870  INFO  Phase3 Music / Entertainment | VNmhYLZxGMo | quota used: 409
+2026-04-17 13:19:54,978  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:19:54,980  INFO    Comments disabled — VNmhYLZxGMo, skipping.
+2026-04-17 13:19:54,994  INFO  Phase3 Music / Entertainment | m65MJSC1Jto | quota used: 409
+2026-04-17 13:19:58,503  INFO    +50 comments | video: Gucci Mane - Crash Dummy [Official Audio]
+2026-04-17 13:19:58,515  INFO  Phase3 Music / Entertainment | jaBZ9xXM2gU | quota used: 410
+2026-04-17 13:20:01,889  INFO    +50 comments | video: TEDDY AFRO  - መሬማ - Merema | Track 15 (Official Lyrics 
+2026-04-17 13:20:01,900  INFO  Phase3 Music / Entertainment | OHwQ27MPny0 | quota used: 411
+2026-04-17 13:20:05,097  INFO    +50 comments | video: Fabolous - WYFL Freestyle - Brooklyn Badness (Official 
+2026-04-17 13:20:05,101  INFO  Phase3 Music / Entertainment | q-eL7-tWu9M | quota used: 412
+2026-04-17 13:20:08,205  INFO    +4 comments | video: Don Omar - Taboo (Audio)
+2026-04-17 13:20:08,219  INFO  Phase3 Music / Entertainment | sQmi5dAYPlo | quota used: 413
+2026-04-17 13:20:11,426  INFO    +50 comments | video: Skrilla - Free 40 ft. YoungBoy Never Broke Again (Visua
+2026-04-17 13:20:11,432  INFO  Phase3 Music / Entertainment | 78wrful9cVU | quota used: 414
+2026-04-17 13:20:14,761  INFO    +50 comments | video: Olivia Rodrigo - drop dead (Official Music Video)
+2026-04-17 13:20:14,775  INFO  Phase3 Music / Entertainment | RDHss6DmcU8 | quota used: 415
+2026-04-17 13:20:17,924  INFO    +34 comments | video: Grupo Frontera, Fuerza Regida - COQUETA (Letra)
+2026-04-17 13:20:17,938  INFO  Phase3 Music / Entertainment | _gyultVTesk | quota used: 416
+2026-04-17 13:20:21,227  INFO    +50 comments | video: BTS (방탄소년단) '2.0' Official MV
+2026-04-17 13:20:21,240  INFO  Phase3 Music / Entertainment | 2wI4_-aMSk0 | quota used: 417
+2026-04-17 13:20:24,500  INFO    +50 comments | video: YoungBoy Never Broke Again - Bruce Wayne [Official Vide
+2026-04-17 13:20:24,507  INFO  Phase3 Music / Entertainment | c1fvlejpIAA | quota used: 418
+2026-04-17 13:20:27,635  INFO    +50 comments | video: Los Gemelos De Sinaloa, Clave Especial, Fuerza Regida -
+2026-04-17 13:20:27,648  INFO  Phase3 Music / Entertainment | EImIUIy1Lp4 | quota used: 419
+2026-04-17 13:20:30,917  INFO    +50 comments | video: Allstar JR - Mob Untied
+2026-04-17 13:20:30,930  INFO  Phase3 Music / Entertainment | yNa8jP4zoJo | quota used: 420
+2026-04-17 13:20:34,211  INFO    +50 comments | video: Laufey - Madwoman (Official Music Video)
+2026-04-17 13:20:34,225  INFO  Phase3 Music / Entertainment | VShEb74w-dY | quota used: 421
+2026-04-17 13:20:37,411  INFO    +7 comments | video: Don Omar - Virtual Diva (Audio)
+2026-04-17 13:20:37,423  INFO  Phase3 Music / Entertainment | t_OyQhiqXgA | quota used: 422
+2026-04-17 13:20:40,784  INFO    +50 comments | video: Olivia Rodrigo - drop dead (Lyric Video)
+2026-04-17 13:20:40,797  INFO  Phase3 Music / Entertainment | 9EqR0pwDCds | quota used: 423
+2026-04-17 13:20:43,973  INFO    +50 comments | video: INGAROSE - CELEBRATE ME (Lyrics)
+2026-04-17 13:20:43,981  INFO  Phase3 Music / Entertainment | bj59NrnRNek | quota used: 424
+2026-04-17 13:20:47,074  INFO    +3 comments | video: Wisin & Yandel - Te Siento (Audio)
+2026-04-17 13:20:47,081  INFO  Phase3 Music / Entertainment | ADc9JPeLYi4 | quota used: 425
+2026-04-17 13:20:50,384  INFO    +50 comments | video: TEDDY AFRO  - ዳስ ጣል (አንሳው)  - Das Tal (Ansaw) | Track 1
+2026-04-17 13:20:50,395  INFO  Phase3 Music / Entertainment | KWoTyfPsqbE | quota used: 426
+2026-04-17 13:20:53,614  INFO    +50 comments | video: Sabrina Carpenter - House Tour (Official Video)
+2026-04-17 13:20:53,627  INFO  Phase3 Music / Entertainment | zl5ZYQeX3-E | quota used: 427
+2026-04-17 13:20:56,704  INFO    +9 comments | video: Don Omar - Ayer La Vi (Audio)
+2026-04-17 13:20:56,715  INFO  Phase3 Music / Entertainment | Fsr14-8sxtA | quota used: 428
+2026-04-17 13:21:00,034  INFO    +50 comments | video: Jay Wheeler - De Lejitos (Official Video)
+2026-04-17 13:21:00,044  INFO  Phase3 Music / Entertainment | d2uSf90mWqo | quota used: 429
+2026-04-17 13:21:03,298  INFO    +50 comments | video: DeeBaby - Merry Go Round / Arm & a Leg ( OFFICIAL MUSIC
+2026-04-17 13:21:03,310  INFO  Phase3 Music / Entertainment | N03dZ77nAcE | quota used: 430
+2026-04-17 13:21:06,588  INFO    +50 comments | video: Finesse2Tymes ''2FithyRicky'' - Who Do You Think You Ar
+2026-04-17 13:21:06,601  INFO  Phase3 Music / Entertainment | diBO0gMuTXo | quota used: 431
+2026-04-17 13:21:09,990  INFO    +50 comments | video: BTS (방탄소년단) 'Hooligan' Official MV
+2026-04-17 13:21:10,000  INFO  Phase3 Music / Entertainment | nUsrYVxrDwI | quota used: 432
+2026-04-17 13:21:13,349  INFO    +50 comments | video: Ella Langley - Choosin' Texas (Official Video)
+2026-04-17 13:21:13,360  INFO  Phase3 Music / Entertainment | 7F1ET2XHQfk | quota used: 433
+2026-04-17 13:21:16,730  INFO    +50 comments | video: KATSEYE (캣츠아이) "PINKY UP" Official MV
+2026-04-17 13:21:16,745  INFO  Phase3 News / Current Events | Aq07vxX8yGw | quota used: 434
+2026-04-17 13:21:20,064  INFO    +50 comments | video: How Trump's Rock-Bottom Will Only Get Worse: Wolff | In
+2026-04-17 13:21:20,077  INFO  Phase3 News / Current Events | Vv9Bh6Pu3uc | quota used: 435
+2026-04-17 13:21:23,384  INFO    +50 comments | video: Tucker on the New Religion of Trump’s America and His M
+2026-04-17 13:21:23,393  INFO  Phase3 News / Current Events | VC1tEU_I3gk | quota used: 436
+2026-04-17 13:21:26,665  INFO    +50 comments | video: Trump Attacks the Pope, Thinks He’s Jesus & Bashes Spri
+2026-04-17 13:21:26,676  INFO  Phase3 News / Current Events | v0Y2d8Zbj4k | quota used: 437
+2026-04-17 13:21:29,864  INFO    +50 comments | video: 1 Mile Per DAY!
+2026-04-17 13:21:29,875  INFO  Phase3 News / Current Events | HTi8sE-QT1I | quota used: 438
+2026-04-17 13:21:33,320  INFO    +50 comments | video: Harris Faulkner: This is SINISTER
+2026-04-17 13:21:33,331  INFO  Phase3 News / Current Events | LUrO7hn2N-o | quota used: 439
+2026-04-17 13:21:36,697  INFO    +50 comments | video: Federal Judge rejects Trooper’s bid to dismiss lawsuit
+2026-04-17 13:21:36,711  INFO  Phase3 News / Current Events | u33zTDa95as | quota used: 440
+2026-04-17 13:21:40,070  INFO    +50 comments | video: Tehran Prof Marandi: Israel WILL Restart Iran War
+2026-04-17 13:21:40,079  INFO  Phase3 News / Current Events | Tz4Mx0DG9EM | quota used: 441
+2026-04-17 13:21:43,455  INFO    +50 comments | video: Sec  Hegseth, Gen  Caine provide update on Operation Ep
+2026-04-17 13:21:43,465  INFO  Phase3 News / Current Events | T9E71gKF6ho | quota used: 442
+2026-04-17 13:21:46,782  INFO    +50 comments | video: Hombre es arrestado tras irrumpir en una casa de Califo
+2026-04-17 13:21:46,794  INFO  Phase3 News / Current Events | f863vTF0tVk | quota used: 443
+2026-04-17 13:21:50,041  INFO    +50 comments | video: Stephen A. calls Draymond Green’s game vs. Clippers ‘on
+2026-04-17 13:21:50,047  INFO  Phase3 News / Current Events | VqNVJJB3fnU | quota used: 444
+2026-04-17 13:21:53,380  INFO    +50 comments | video: BREAKING: Hair from inside Nancy Guthrie’s house sent t
+2026-04-17 13:21:53,391  INFO  Phase3 News / Current Events | 8UbMDzYjvuc | quota used: 445
+2026-04-17 13:21:56,707  INFO    +50 comments | video: Iran Crumbles, Critics Scramble: Trump’s Long Game Leav
+2026-04-17 13:21:56,720  INFO  Phase3 News / Current Events | XLmkOiHmPf0 | quota used: 446
+2026-04-17 13:21:59,987  INFO    +50 comments | video: Orlando mom calls for end tocars speeding past stoppeds
+2026-04-17 13:21:59,999  INFO  Phase3 News / Current Events | 4lkuq7Gg2AM | quota used: 447
+2026-04-17 13:22:03,203  INFO    +50 comments | video: Weekend Update: U.S. and Iran Peace Talks, Melania Trum
+2026-04-17 13:22:03,216  INFO  Phase3 News / Current Events | kcyBJq3MRCY | quota used: 448
+2026-04-17 13:22:06,469  INFO    +50 comments | video: New Jersey Cop Arrests Auditor In ID Refusal!
+2026-04-17 13:22:06,481  INFO  Phase3 News / Current Events | maltarabhNM | quota used: 449
+2026-04-17 13:22:09,786  INFO    +50 comments | video: Gen Keane: We are on the CUSP
+2026-04-17 13:22:09,800  INFO  Phase3 News / Current Events | S5Nv8MiqLEA | quota used: 450
+2026-04-17 13:22:13,060  INFO    +50 comments | video: PUMP SWITCHING:POLICE WARN DRIVE RSOFGROWING SCAM AT GA
+2026-04-17 13:22:13,071  INFO  Phase3 News / Current Events | 4_r9oyTCI-M | quota used: 451
+2026-04-17 13:22:16,313  INFO    +50 comments | video: OMG: Trump’s friendly Fox interview turns into DISASTER
+2026-04-17 13:22:16,325  INFO  Phase3 News / Current Events | 8xByFezUtVA | quota used: 452
+2026-04-17 13:22:19,664  INFO    +50 comments | video: They Tried To Rob Her in Her Own Garage!
+2026-04-17 13:22:19,676  INFO  Phase3 News / Current Events | b6wAe1Lrjbg | quota used: 453
+2026-04-17 13:22:22,947  INFO    +50 comments | video: NEWS: JD Vance has extremely rough night at TPUSA event
+2026-04-17 13:22:22,960  INFO  Phase3 News / Current Events | 6M4lZ9ni1K8 | quota used: 454
+2026-04-17 13:22:26,363  INFO    +50 comments | video: IHIP News: 🚨 Melania's WORST NIGHTMARE Coming True! Her
+2026-04-17 13:22:26,373  INFO  Phase3 News / Current Events | fAKrF8t7ow0 | quota used: 455
+2026-04-17 13:22:29,711  INFO    +50 comments | video: China FM Reacts😳 Netanyahu Notice Rejected🚨#viralvideo 
+2026-04-17 13:22:29,726  INFO  Phase3 News / Current Events | JOqO8FdZbhE | quota used: 456
+2026-04-17 13:22:33,137  INFO    +50 comments | video: Trump’s FOX Interview on Iran Was a Total Mess
+2026-04-17 13:22:33,147  INFO  Phase3 News / Current Events | zLp2RARw6lQ | quota used: 457
+2026-04-17 13:22:36,346  INFO    +50 comments | video: This Severe Outbreak Is About To Get WORSE...
+2026-04-17 13:22:36,354  INFO  Phase3 News / Current Events | 5iC0x3TmOto | quota used: 458
+2026-04-17 13:22:39,672  INFO    +50 comments | video: 🚨JD Vance HECKLED in EMPTY STADIUM during Speech
+2026-04-17 13:22:39,682  INFO  Phase3 News / Current Events | cmuvyqhTicY | quota used: 459
+2026-04-17 13:22:43,174  INFO    +50 comments | video: How Trump’s Advisers Felt About Going to War With Iran
+2026-04-17 13:22:43,181  INFO  Phase3 News / Current Events | UxRuQ6oUinI | quota used: 460
+2026-04-17 13:22:46,358  INFO    +50 comments | video: Some Good News to get you through April!
+2026-04-17 13:22:46,372  INFO  Phase3 News / Current Events | SwjzPVnrGHk | quota used: 461
+2026-04-17 13:22:49,713  INFO    +50 comments | video: Patient Left on MRI Table for 6 Hours — Hospital Error 
+2026-04-17 13:22:49,726  INFO  Phase3 News / Current Events | VIH1DsUhNtA | quota used: 462
+2026-04-17 13:22:53,093  INFO    +50 comments | video: 🚨 BREAKING: IRGC Economic Collapse In Iran - Ceasefire 
+2026-04-17 13:22:53,106  INFO  Phase3 News / Current Events | zKF5WmZLMQw | quota used: 463
+2026-04-17 13:22:56,479  INFO    +50 comments | video: Israel and South Korea clash over old West Bank video
+2026-04-17 13:22:56,492  INFO  Phase3 News / Current Events | FHpBwJt8FsM | quota used: 464
+2026-04-17 13:22:59,764  INFO    +50 comments | video: ABC World News Tonight with David Muir Full Broadcast -
+2026-04-17 13:22:59,775  INFO  Phase3 News / Current Events | qfkbTqLO9to | quota used: 465
+2026-04-17 13:23:03,079  INFO    +50 comments | video: Candace Owens Calls Out Fox Clip
+2026-04-17 13:23:03,091  INFO  Phase3 News / Current Events | 6o1DRupvrr0 | quota used: 466
+2026-04-17 13:23:06,295  INFO    +50 comments | video: UN NENE EN MEDIO DEL TERROR: Dispararon contra una mamá
+2026-04-17 13:23:06,309  INFO  Phase3 News / Current Events | edK_sLNgZVM | quota used: 467
+2026-04-17 13:23:09,567  INFO    +50 comments | video: Melania Confronted Over Past Obama Claim 😳 #MelaniaTrum
+2026-04-17 13:23:09,577  INFO  Phase3 News / Current Events | RRnlPUzMlgY | quota used: 468
+2026-04-17 13:23:12,806  INFO    +50 comments | video: This Fake App Store Crypto Wallet Stole Musician's Life
+2026-04-17 13:23:12,818  INFO  Phase3 News / Current Events | 0ehvW2FO5-8 | quota used: 469
+2026-04-17 13:23:16,304  INFO    +50 comments | video: “It's An Act Of WAR!” Professor Jiang vs Gordon Chang O
+2026-04-17 13:23:16,317  INFO  Phase3 News / Current Events | JM5gZwuOCk8 | quota used: 470
+2026-04-17 13:23:19,730  INFO    +50 comments | video: Target and Whole Foods LEAVE NYC... as Mamdani Launches
+2026-04-17 13:23:19,741  INFO  Phase3 News / Current Events | QhlDbu2rpzM | quota used: 471
+2026-04-17 13:23:22,902  INFO    +50 comments | video: Dump truck pours entire trash load into yard after paym
+2026-04-17 13:23:22,914  INFO  Phase3 News / Current Events | h4WSpp5TIHE | quota used: 472
+2026-04-17 13:23:26,200  INFO    +50 comments | video: Inside Mexico’s Cartel Civil War
+2026-04-17 13:23:26,210  INFO  Phase3 News / Current Events | M6JWj-7Wz6c | quota used: 473
+2026-04-17 13:23:29,396  INFO    +50 comments | video: Allbirds rebrands as AI company, stock jumps 600%
+2026-04-17 13:23:29,408  INFO  Phase3 News / Current Events | Tf_UjBMIzNo | quota used: 474
+2026-04-17 13:23:32,489  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:23:32,491  INFO    Comments disabled — Tf_UjBMIzNo, skipping.
+2026-04-17 13:23:32,506  INFO  Phase3 News / Current Events | qyHfgrMPxyo | quota used: 474
+2026-04-17 13:23:35,907  INFO    +50 comments | video: ‘He thinks he's smarter than the POPE?: Nicolle and Tim
+2026-04-17 13:23:35,920  INFO  Phase3 News / Current Events | g6k55WQ5GAk | quota used: 475
+2026-04-17 13:23:39,278  INFO    +50 comments | video: Trump Rages at Pope Leo, JD Vance Fumbles Iran Deal & H
+2026-04-17 13:23:39,293  INFO  Phase3 News / Current Events | _dT_cJpMdz8 | quota used: 476
+2026-04-17 13:23:42,662  INFO    +50 comments | video: Lefties Losing It: Democrat Eric Swalwell's tawdry anti
+2026-04-17 13:23:42,672  INFO  Phase3 News / Current Events | o_dz7QG7dVU | quota used: 477
+2026-04-17 13:23:46,032  INFO    +50 comments | video: Watch: T.I. confronts officers who arrested son, rapper
+2026-04-17 13:23:46,044  INFO  Phase3 News / Current Events | 4HqejWEkLbM | quota used: 478
+2026-04-17 13:23:49,306  INFO    +50 comments | video: Patient dies after Florida doctor allegedly removed his
+2026-04-17 13:23:49,319  INFO  Phase3 News / Current Events | NVDZYjwSkck | quota used: 479
+2026-04-17 13:23:52,568  INFO    +50 comments | video: Influential U.S. cardinals caution against Iran war, Tr
+2026-04-17 13:23:52,580  INFO  Phase3 News / Current Events | kOWefKbalsE | quota used: 480
+2026-04-17 13:23:55,820  INFO    +50 comments | video: Hormuz Crisis "Only Going to Get More Horrific Before I
+2026-04-17 13:23:55,830  INFO  Phase3 News / Current Events | OcpMXZk60S0 | quota used: 481
+2026-04-17 13:23:58,945  INFO    +50 comments | video: 🔴 BREAKING TORNADO WARNING IN DETROIT, MICHIGAN - Torna
+2026-04-17 13:23:58,959  INFO  Phase3 News / Current Events | S7yJCpdRBg0 | quota used: 482
+2026-04-17 13:24:02,255  INFO    +50 comments | video: Jewelry store owners fight back after robbers smash thr
+2026-04-17 13:24:02,268  INFO  Phase3 Personal Vlog | 8c_WghpU-AE | quota used: 483
+2026-04-17 13:24:05,689  INFO    +50 comments | video: one day my life❤️🥺#shorts #food #love #emotional #tiyav
+2026-04-17 13:24:05,699  INFO  Phase3 Personal Vlog | LBPpjzwmIbw | quota used: 484
+2026-04-17 13:24:09,225  INFO    +50 comments | video: One day with my CRAZY NAILS🙉 #beauty #nails #nailart #v
+2026-04-17 13:24:09,238  INFO  Phase3 Personal Vlog | hn64H2LdjR8 | quota used: 485
+2026-04-17 13:24:12,986  INFO    +50 comments | video: MORNING IN MY LIFE AT THE UNIVERSITY OF ALABAMA | frida
+2026-04-17 13:24:12,997  INFO  Phase3 Personal Vlog | 9MpQO7FA90w | quota used: 486
+2026-04-17 13:24:16,511  INFO    +50 comments | video: ☁️4am-4pm day in the life🩰#asmr #morningroutine #mornin
+2026-04-17 13:24:16,522  INFO  Phase3 Personal Vlog | byIhg25aiqQ | quota used: 487
+2026-04-17 13:24:19,938  INFO    +50 comments | video: Day 8 Ramadhan 😍 #VlogRamadhan #Ramadhan #MiniVlog #Ram
+2026-04-17 13:24:19,952  INFO  Phase3 Personal Vlog | m_cBFweN-Vw | quota used: 488
+2026-04-17 13:24:23,413  INFO    +50 comments | video: Romantisasi lebaran terakhir tinggal sendiri sebelum…😋 
+2026-04-17 13:24:23,425  INFO  Phase3 Personal Vlog | u_cSBgJcW0Y | quota used: 489
+2026-04-17 13:24:27,000  INFO    +50 comments | video: A DAY IN MY NEW LIFE | Ep 527 | Pihu ka vacation routin
+2026-04-17 13:24:27,012  INFO  Phase3 Personal Vlog | Zb8L0YGDzQI | quota used: 490
+2026-04-17 13:24:30,721  INFO    +50 comments | video: Living Alone Diaries | What I Eat in a Day (simple & ea
+2026-04-17 13:24:30,729  INFO  Phase3 Personal Vlog | qqD50l6uMoI | quota used: 491
+2026-04-17 13:24:34,088  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:24:34,089  INFO    Comments disabled — qqD50l6uMoI, skipping.
+2026-04-17 13:24:34,102  INFO  Phase3 Personal Vlog | TzEQcToWTTk | quota used: 491
+2026-04-17 13:24:37,644  INFO    +50 comments | video: Minivlog#274 🙋‍♀️Biriyani la vara chicken piece yarukel
+2026-04-17 13:24:37,654  INFO  Phase3 Personal Vlog | Nm2Q1WFf5-Y | quota used: 492
+2026-04-17 13:24:40,965  INFO    +50 comments | video: Day in the life of a mom w/ 2 toddlers
+2026-04-17 13:24:40,979  INFO  Phase3 Personal Vlog | 0C3niT8brZ8 | quota used: 493
+2026-04-17 13:24:44,542  INFO    +50 comments | video: A day in my life edisi di rumah | video lucu
+2026-04-17 13:24:44,547  INFO  Phase3 Personal Vlog | v_TiACkaN2k | quota used: 494
+2026-04-17 13:24:47,938  INFO    +50 comments | video: Realistic Solo Van Life Night Routine #vanlife #nightro
+2026-04-17 13:24:47,949  INFO  Phase3 Personal Vlog | HhM0BYCHL00 | quota used: 495
+2026-04-17 13:24:51,381  INFO    +50 comments | video: Kylie Jenner: A Day in the Life
+2026-04-17 13:24:51,394  INFO  Phase3 Personal Vlog | 06eNGSviStM | quota used: 496
+2026-04-17 13:24:55,005  INFO    +50 comments | video: A Lazy Day in my Life #minivlog #ytshorts #shorts
+2026-04-17 13:24:55,015  INFO  Phase3 Personal Vlog | P4hnJyXvDcg | quota used: 497
+2026-04-17 13:24:58,476  INFO    +50 comments | video: Birthday Se Ek Din Pahle 😍 #mariakhan #shorts @mukeem03
+2026-04-17 13:24:58,482  INFO  Phase3 Personal Vlog | OKpyZArSBuw | quota used: 498
+2026-04-17 13:25:01,923  INFO    +50 comments | video: A Day in My Life *No talking #minivlog #ytshorts #asthe
+2026-04-17 13:25:01,935  INFO  Phase3 Personal Vlog | KRuXrGGi9GU | quota used: 499
+2026-04-17 13:25:05,394  INFO    +50 comments | video: A Day in My Life in 60 Seconds | Online Educator | Sund
+2026-04-17 13:25:05,405  INFO  Phase3 Personal Vlog | ndbmEEysKQo | quota used: 500
+2026-04-17 13:25:08,875  INFO    +50 comments | video: Teen Ballerina's Daily Routine 1 Week Before a Show | T
+2026-04-17 13:25:08,887  INFO  Phase3 Personal Vlog | gbDR39yIs3Y | quota used: 501
+2026-04-17 13:25:12,458  INFO    +50 comments | video: Day in my life | living alone, 5AM morning, gym, school
+2026-04-17 13:25:12,469  INFO  Phase3 Personal Vlog | 3jcxLcWMSmI | quota used: 502
+2026-04-17 13:25:16,048  INFO    +50 comments | video: A day in my life as Content Creator #minivlogs #vlogs #
+2026-04-17 13:25:16,064  INFO  Phase3 Personal Vlog | FGvdNUgC5Kk | quota used: 503
+2026-04-17 13:25:19,632  INFO    +50 comments | video: A Day In The Life At AMERICAN PUBLIC SCHOOL
+2026-04-17 13:25:19,646  INFO  Phase3 Personal Vlog | OS9HyDxkmd0 | quota used: 504
+2026-04-17 13:25:22,917  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:25:22,918  INFO    Comments disabled — OS9HyDxkmd0, skipping.
+2026-04-17 13:25:22,935  INFO  Phase3 Personal Vlog | 76z9g_4oZS0 | quota used: 504
+2026-04-17 13:25:26,120  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:25:26,120  INFO    Comments disabled — 76z9g_4oZS0, skipping.
+2026-04-17 13:25:26,130  INFO  Phase3 Personal Vlog | QWU1v6IKOQ8 | quota used: 504
+2026-04-17 13:25:29,776  INFO    +50 comments | video: Trying out Einstein’s daily routine for a day! 😳🤓
+2026-04-17 13:25:29,789  INFO  Phase3 Personal Vlog | rajP_98zPnw | quota used: 505
+2026-04-17 13:25:33,198  INFO    +50 comments | video: A day in my life sebagai sumo👀
+2026-04-17 13:25:33,211  INFO  Phase3 Personal Vlog | lc_wBkCan5s | quota used: 506
+2026-04-17 13:25:36,570  INFO    +50 comments | video: #118 5:30am Summer Morning Routine in the Countryside |
+2026-04-17 13:25:36,579  INFO  Phase3 Personal Vlog | uvv9ErQDTyw | quota used: 507
+2026-04-17 13:25:40,017  INFO    +50 comments | video: A Day in My Life *Shifting Vlog #minivlog #ytshorts #sh
+2026-04-17 13:25:40,029  INFO  Phase3 Personal Vlog | q-kalXBFFNg | quota used: 508
+2026-04-17 13:25:43,577  INFO    +50 comments | video: REAL day in the life (birthday + packed my hospital bag
+2026-04-17 13:25:43,590  INFO  Phase3 Personal Vlog | LzpCldPiT0c | quota used: 509
+2026-04-17 13:25:46,907  INFO    +50 comments | video: Day In The Life Of A Doctor | My FIRST Hospital Vlog!
+2026-04-17 13:25:46,917  INFO  Phase3 Personal Vlog | bRfRjdjImwI | quota used: 510
+2026-04-17 13:25:50,614  INFO    +50 comments | video: Ini yeahh a day in mai laip yank kalian minta🤬🤬🤬🥰 #siti
+2026-04-17 13:25:50,628  INFO  Phase3 Personal Vlog | 1gKyNR43CPk | quota used: 511
+2026-04-17 13:25:53,895  INFO    +50 comments | video: A Day In My Life Seharian Ngurus Bayik💓
+2026-04-17 13:25:53,903  INFO  Phase3 Personal Vlog | -Naw70PNjEI | quota used: 512
+2026-04-17 13:25:57,314  INFO    +50 comments | video: Everything I ate today as a college student at GCU
+2026-04-17 13:25:57,326  INFO  Phase3 Personal Vlog | azptpim3QZc | quota used: 513
+2026-04-17 13:26:00,797  INFO    +50 comments | video: A day in my life during exams📚🧖‍♀️
+2026-04-17 13:26:00,806  INFO  Phase3 Personal Vlog | B0WU5FfRLkQ | quota used: 514
+2026-04-17 13:26:04,184  INFO    +50 comments | video: COLLEGE MORNING IN MY LIFE | wednesday morning vlog
+2026-04-17 13:26:04,189  INFO  Phase3 Personal Vlog | cV_gkkLTh1Q | quota used: 515
+2026-04-17 13:26:07,429  INFO    +50 comments | video: Most Hated Day In Japan?! 🇯🇵
+2026-04-17 13:26:07,440  INFO  Phase3 Personal Vlog | lmE35hCccS8 | quota used: 516
+2026-04-17 13:26:10,779  INFO    +50 comments | video: (SUB) 고등학생의 일상ㅣ개학날 VLOGㅣDaily Life of a Korean High sch
+2026-04-17 13:26:10,791  INFO  Phase3 Personal Vlog | 1elU6BaL05k | quota used: 517
+2026-04-17 13:26:14,075  INFO    +50 comments | video: COLLEGE MORNING IN MY LIFE | grwm for class vlog #unive
+2026-04-17 13:26:14,085  INFO  Phase3 Personal Vlog | lumimB_aa7M | quota used: 518
+2026-04-17 13:26:17,449  INFO    +50 comments | video: A DAY IN MY LIFE | Gym, Work, Eating
+2026-04-17 13:26:17,456  INFO  Phase3 Personal Vlog | GOrzByZHbFs | quota used: 519
+2026-04-17 13:26:21,294  INFO    +50 comments | video: Day in a life
+2026-04-17 13:26:21,304  INFO  Phase3 Personal Vlog | SqNWbqW2Jjw | quota used: 520
+2026-04-17 13:26:24,637  INFO    +50 comments | video: 5am asmr morning routine  #asmr #morningroutine #dayinm
+2026-04-17 13:26:24,649  INFO  Phase3 Personal Vlog | iRHDDXMsn24 | quota used: 521
+2026-04-17 13:26:28,375  INFO    +50 comments | video: [Vlog] I'm a Japanese uni student 🇯🇵 I have no friends 
+2026-04-17 13:26:28,385  INFO  Phase3 Personal Vlog | 8LswxD-ckeU | quota used: 522
+2026-04-17 13:26:32,071  INFO    +50 comments | video: HARVARD PRE-MED *REALISTIC* DAY-IN-MY-LIFE
+2026-04-17 13:26:32,078  INFO  Phase3 Personal Vlog | 7Xf92HQpeSo | quota used: 523
+2026-04-17 13:26:35,726  INFO    +50 comments | video: Day in my life (broke my toe)
+2026-04-17 13:26:35,747  INFO  Phase3 Personal Vlog | qypvWeJFnnI | quota used: 524
+2026-04-17 13:26:39,419  INFO    +50 comments | video: Vava karanjal Achuvum karaum 🥰 paavam #couple #newborn
+2026-04-17 13:26:39,433  INFO  Phase3 Personal Vlog | hN7XlKmVq6c | quota used: 525
+2026-04-17 13:26:42,804  INFO    +50 comments | video: Day in the life in my new NYC apartment!
+2026-04-17 13:26:42,816  INFO  Phase3 Personal Vlog | po3jAbzFOXY | quota used: 526
+2026-04-17 13:26:46,358  INFO    +50 comments | video: Sunday Routine #satisfying #motivation #asmr #dayinthel
+2026-04-17 13:26:46,369  INFO  Phase3 Personal Vlog | pqb7H5jTAT0 | quota used: 527
+2026-04-17 13:26:49,743  INFO    +50 comments | video: Twin mom day in the life 😉 #dayinthelife #minivlog #vlo
+2026-04-17 13:26:49,752  INFO  Phase3 Personal Vlog | PhLAnjFcwJ8 | quota used: 528
+2026-04-17 13:26:53,082  INFO    +50 comments | video: If Influencers Were Honest - Episode 2 “Day in My Life”
+2026-04-17 13:26:53,091  INFO  Phase3 Personal Vlog | xyAxT1DTKe0 | quota used: 529
+2026-04-17 13:26:56,374  WARNING  Encountered 403 Forbidden with reason "commentsDisabled"
+2026-04-17 13:26:56,376  INFO    Comments disabled — xyAxT1DTKe0, skipping.
+2026-04-17 13:26:56,551  INFO  Phase 3 complete. 10867 comments written to /Users/rosemary/Desktop/yt-depression-signals/data/raw/comments.json
+2026-04-17 13:26:56,554  INFO    Mental Health                  2499 comments
+2026-04-17 13:26:56,554  INFO    News / Current Events          2450 comments
+2026-04-17 13:26:56,554  INFO    Fitness / Wellness             2399 comments
+2026-04-17 13:26:56,554  INFO    Personal Vlog                  2300 comments
+2026-04-17 13:26:56,554  INFO    Music / Entertainment          1219 comments
+2026-04-17 13:26:56,557  INFO  Done.  videos  → /Users/rosemary/Desktop/yt-depression-signals/data/raw/videos.json
+2026-04-17 13:26:56,558  INFO         comments → /Users/rosemary/Desktop/yt-depression-signals/data/raw/comments.json
