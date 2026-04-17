@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Depression Signal Detection — Pipeline</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f4f0;
+    color: #1a1a18;
+    padding: 32px 16px;
+  }
+  h1 { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #6b6b66; margin-bottom: 8px; }
+  .rq {
+    max-width: 780px; margin: 0 auto 24px;
+    background: #fff; border: 1px solid #e0dfd8;
+    border-left: 4px solid #7f77dd; border-radius: 8px;
+    padding: 14px 18px; font-size: 13px; color: #3c3489; line-height: 1.6;
+  }
+  .rq strong { font-style: normal; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #888; display: block; margin-bottom: 4px; }
+  .pipeline { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; }
+  .step { border-radius: 12px; padding: 18px 20px 20px; }
+  .step-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 3px; flex-wrap: wrap; }
+  .step-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+  .step-title { font-size: 15px; font-weight: 600; }
+  .badge { font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+  .step-desc { font-size: 12px; margin-bottom: 12px; opacity: 0.68; line-height: 1.5; }
+  .cards { display: flex; gap: 8px; flex-wrap: wrap; }
+  .card { flex: 1; min-width: 140px; border-radius: 8px; padding: 11px 13px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(0,0,0,0.07); }
+  .card-title { font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+  .card-body { font-size: 11.5px; line-height: 1.55; opacity: 0.72; }
+  .arrow { text-align: center; font-size: 18px; color: #bbb; padding: 4px 0; }
+
+  /* note box */
+  .note { max-width: 780px; margin: 0 auto 0;
+    border: 1px solid #e0dfd8; border-radius: 8px;
+    padding: 13px 18px; font-size: 12px; color: #555; line-height: 1.6;
+    background: #fff; }
+  .note strong { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #999; display: block; margin-bottom: 4px; }
+
+  /* layer box inside step 2 */
+  .layers { display: flex; flex-direction: column; gap: 7px; margin-top: 2px; }
+  .layer { border-radius: 8px; padding: 10px 14px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(0,0,0,0.07); }
+  .layer-head { font-size: 12.5px; font-weight: 600; margin-bottom: 3px; }
+  .layer-body { font-size: 11.5px; line-height: 1.55; opacity: 0.72; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 600;
+    border-radius: 3px; padding: 1px 6px; margin-right: 5px; vertical-align: middle; }
+
+  /* result table */
+  .result-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .result-table th { text-align: left; font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1); color: #555; }
+  .result-table td { padding: 7px 10px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: #444; vertical-align: middle; }
+  .result-table tr:last-child td { border-bottom: none; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+  /* step colors */
+  .s0 { background: #ebebea; }
+  .s0 .step-label { color: #555; } .s0 .step-title { color: #222; }
+
+  .s1 { background: #eeedfe; }
+  .s1 .step-label { color: #534ab7; } .s1 .step-title { color: #3c3489; }
+  .s1 .card { border-color: rgba(83,74,183,0.12); }
+
+  .s2 { background: #e1f5ee; }
+  .s2 .step-label { color: #0f6e56; } .s2 .step-title { color: #085041; }
+  .s2 .layer { border-color: rgba(15,110,86,0.12); }
+  .tag-l1 { background: #9fe1cb; color: #04342c; }
+  .tag-l2 { background: #5dcaa5; color: #04342c; }
+  .tag-l3 { background: #1d9e75; color: #fff; }
+
+  .s3 { background: #faeeda; }
+  .s3 .step-label { color: #854f0b; } .s3 .step-title { color: #633806; }
+  .s3 .card { border-color: rgba(133,79,11,0.12); }
+  .badge-star { background: #ef9f27; color: #412402; }
+
+  .s4 { background: #faece7; }
+  .s4 .step-label { color: #993c1d; } .s4 .step-title { color: #4a1b0c; }
+  .s4 .card { border-color: rgba(153,60,29,0.12); }
+  .badge-opt { background: #d85a30; color: #fff; }
+
+  .limits { max-width: 780px; margin: 0 auto;
+    border: 1.5px dashed #ccc; border-radius: 10px; padding: 14px 18px; }
+  .limits-title { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; }
+  .limits ul { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; }
+  .limits li { font-size: 11.5px; color: #666; background: #eee; border-radius: 20px; padding: 3px 11px; }
+
+  footer { text-align: center; font-size: 11px; color: #bbb; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>YouTube Depression Signal Detection</h1>
+<p class="subtitle">Pipeline — share with team</p>
+
+<div class="rq">
+  <strong>Research questions</strong>
+  1. Across different YouTube content categories, how does the natural prevalence of depression-indicative language vary?<br>
+  2. To what extent does video-level contextual framing shape the linguistic patterns of depression-related self-disclosure in comments?
+</div>
+
+<div class="note" style="margin: 0 auto 16px; max-width: 780px;">
+  <strong>Core design principle</strong>
+  The analysis unit is the <strong>comment</strong>, not the video. We do not search for depression-related videos. We sample high-traffic videos across five everyday categories, then scan every comment for depression-indicative language using a three-layer NLP method. Depression relevance is determined entirely post-hoc at the comment level.
+</div>
+
+<div class="pipeline">
+
+  <!-- STEP 0 -->
+  <div class="step s0">
+    <div class="step-header">
+      <span class="step-label">Step 0</span>
+      <span class="step-title">Data collection</span>
+    </div>
+    <p class="step-desc">YouTube Data API v3 — five predefined categories, ranked by view count within each category. No depression keywords used.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Five categories</div>
+        <div class="card-body">
+          Mental health · Fitness / wellness<br>
+          Music / entertainment<br>
+          News / current events<br>
+          Personal vlog
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per category</div>
+        <div class="card-body">Top 40–50 videos by view count. ~200–250 videos total.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per video</div>
+        <div class="card-body">Metadata: title, description, tags, view_count, like_count, comment_count.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per video — comments</div>
+        <div class="card-body">Top 50 comments sorted by likes. Stored with video_id as foreign key. ~10,000–12,500 comments total.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- STEP 1 -->
+  <div class="step s1">
+    <div class="step-header">
+      <span class="step-label">Step 1</span>
+      <span class="step-title">Video-level context analysis</span>
+    </div>
+    <p class="step-desc">Input: title + description + tags → Output: one context vector per video. Labels the framing of each video, used later in cross-category comparison.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Sentiment score</div>
+        <div class="card-body">cardiffnlp/twitter-roberta-base-sentiment<br>Score: [−1, 1]</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Topic / theme</div>
+        <div class="card-body">facebook/bart-large-mnli (zero-shot)<br>Confirms category label, detects sub-themes.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Summary</div>
+        <div class="card-body">Abstractive, 1–2 sentences. Human-readable context label for each video.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- STEP 2 -->
+  <div class="step s2">
+    <div class="step-header">
+      <span class="step-label">Step 2</span>
+      <span class="step-title">Comment-level depression signal detection</span>
+    </div>
+    <p class="step-desc">Input: raw comment text (with video_id) → Output: depression signal score per comment. Three layers of increasing specificity — sentiment alone is not enough.</p>
+    <div class="layers">
+      <div class="layer">
+        <div class="layer-head"><span class="tag tag-l1">Layer 1</span> Sentiment score — broad signal</div>
+        <div class="layer-body">Every comment scored positive / negative / neutral via RoBERTa. Baseline feature only — negative sentiment ≠ depression (e.g. "this video is garbage" is negative but irrelevant).</div>
+      </div>
+      <div class="layer">
+        <div class="layer-head"><span class="tag tag-l2">Layer 2</span> Depression lexicon matching — domain-specific</div>
+        <div class="layer-body">Match against LIWC categories (negative emotion, sadness, anxiety, health) and a depression-specific wordlist: "hopeless", "worthless", "exhausted", "numb", "empty", "can't go on". Filters for mental-health-relevant language beyond general negativity.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-head"><span class="tag tag-l3">Layer 3</span> Self-disclosure detection — high precision</div>
+        <div class="layer-body">First-person pronoun + depression-indicative vocabulary combinations: "I feel hopeless", "I've been struggling", "I can't do this anymore". These represent genuine personal disclosure — the strongest research signal.</div>
+      </div>
+    </div>
+    <div class="cards" style="margin-top: 10px;">
+      <div class="card">
+        <div class="card-title">Embedding</div>
+        <div class="card-body">all-MiniLM-L6-v2 or mental-bert. For clustering and UMAP visualization.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Clustering</div>
+        <div class="card-body">HDBSCAN — noise-aware, no fixed k. Groups comments by linguistic pattern.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Output per comment</div>
+        <div class="card-body">sentiment score · lexicon match rate · self-disclosure flag · cluster label · composite depression signal score</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- STEP 3 -->
+  <div class="step s3">
+    <div class="step-header">
+      <span class="step-label">Step 3</span>
+      <span class="step-title">Cross-category comparison <span class="badge badge-star">★ core result</span></span>
+    </div>
+    <p class="step-desc">Join Step 1 video context with Step 2 comment scores via video_id. Compare depression signal prevalence and linguistic patterns across the five categories.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Prevalence table</div>
+        <div class="card-body">Depression signal rate, avg sentiment, self-disclosure rate — per category. Primary result figure.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Statistical tests</div>
+        <div class="card-body">ANOVA / KS-test across categories. Are differences in signal rate significant?</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Heatmap</div>
+        <div class="card-body">Rows: video category. Cols: comment cluster. Cell: avg depression signal score.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">UMAP</div>
+        <div class="card-body">Comment embeddings in 2D, colored by category. Do clusters align with content context?</div>
+      </div>
+    </div>
+
+    <!-- Expected result table -->
+    <table class="result-table" style="margin-top: 14px;">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Depression signal rate</th>
+          <th>Avg sentiment</th>
+          <th>Self-disclosure rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:#7f77dd"></span>Mental health</td><td>measured</td><td>measured</td><td>measured</td></tr>
+        <tr><td><span class="dot" style="background:#1d9e75"></span>Personal vlog</td><td>measured</td><td>measured</td><td>measured</td></tr>
+        <tr><td><span class="dot" style="background:#ef9f27"></span>Fitness / wellness</td><td>measured</td><td>measured</td><td>measured</td></tr>
+        <tr><td><span class="dot" style="background:#378add"></span>News / current events</td><td>measured</td><td>measured</td><td>measured</td></tr>
+        <tr><td><span class="dot" style="background:#d85a30"></span>Music / entertainment</td><td>measured</td><td>measured</td><td>measured</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- STEP 4 -->
+  <div class="step s4">
+    <div class="step-header">
+      <span class="step-label">Step 4</span>
+      <span class="step-title">Supervised modeling <span class="badge badge-opt">optional</span></span>
+    </div>
+    <p class="step-desc">Positive: high-scoring depression signal comments. Negative: low-scoring comments from general categories. Train classifiers, compare interpretable vs. deep models.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Feature vector</div>
+        <div class="card-body">Sentiment + lexicon match rate + pronoun ratio + self-disclosure flag + comment embedding. Engagement-weighted by like_count.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Logistic regression</div>
+        <div class="card-body">Interpretable baseline. Coefficient analysis shows which features matter most.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">BERT fine-tune</td>
+        <div class="card-body">Compare F1 / AUC-ROC vs. baseline. Quantifies value of deep contextual features.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="limits">
+    <div class="limits-title">Limitations to address in paper</div>
+    <ul>
+      <li>Comment ≠ commenter</li>
+      <li>Negative sentiment ≠ depression — addressed by three-layer method</li>
+      <li>Top-comment bias (sorted by likes)</li>
+      <li>Five categories defined by research team — not exhaustive</li>
+      <li>No clinical ground truth</li>
+      <li>Frame results as: "depression-indicative linguistic signals" — not diagnosis</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>Tools: YouTube Data API v3 · RoBERTa · BART-MNLI · LIWC · MiniLM / mental-bert · HDBSCAN · UMAP · seaborn</footer>
+
+</body>
+</html>
