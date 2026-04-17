@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![NLP](https://img.shields.io/badge/NLP-Transformers-green)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
 # YouTube Depression Signal Detection
 
 > Measuring the natural prevalence and linguistic patterns of depression-indicative language across diverse high-traffic YouTube video categories.
