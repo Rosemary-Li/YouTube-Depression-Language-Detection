@@ -1,21 +1,23 @@
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-![NLP](https://img.shields.io/badge/NLP-Transformers-green)
-![Status](https://img.shields.io/badge/Status-Active-success)
-
 # YouTube Depression Signal Detection
 
-> Investigating whether video-level contextual framing moderates depression-indicative linguistic patterns in YouTube comments.
+> Measuring the natural prevalence and linguistic patterns of depression-indicative language across diverse high-traffic YouTube video categories.
 
-We analyze YouTube videos and their comments to detect depression-related linguistic signals. Rather than treating comments in isolation, we treat each comment as **contextually grounded** in its source video — and examine how video-level framing (clinical, motivational, personal story, etc.) shapes the language users produce.
+We collect comments from mainstream, high-engagement YouTube videos spanning multiple content categories — and use NLP to detect depression-related linguistic signals that appear organically in everyday comment sections. Rather than searching for depression content directly, we measure how often and in what form these signals surface in ordinary public discourse.
 
-This project does **not** attempt to diagnose depression. We detect *depression-indicative linguistic signals* as a proxy for self-disclosed depression-related experiences.
+This project does **not** attempt to diagnose depression. We detect *depression-indicative linguistic signals* as a proxy for spontaneous, self-disclosed depression-related expression in the wild.
 
 ---
 
 ## Research Questions
 
-1. Can linguistic signals in YouTube comments identify users who self-disclose depression-related experiences?
-2. To what extent does video-level contextual framing moderate comment-level linguistic patterns?
+1. Across different YouTube content categories, how does the natural prevalence of depression-indicative language vary?
+2. To what extent does video-level contextual framing shape the linguistic patterns of depression-related self-disclosure in comments?
+
+---
+
+## Design Rationale
+
+Most prior work collects data from depression-specific communities (e.g. r/depression), which introduces **self-selection bias** — the users found there have already self-identified as part of a depression community. This project takes a different approach: we sample from high-traffic general-interest videos across multiple categories, then scan the comment sections for depression-indicative language. This better reflects the true **prevalence** of depression-related expression in everyday online discourse, and allows us to compare how that expression differs across content contexts.
 
 ---
 
@@ -96,10 +98,19 @@ python src/modeling.py
 
 ## Data Collection Strategy
 
-- Videos are crawled across general YouTube categories and filtered by **view count only** — no depression-related keywords are used at collection time.
-- Depression relevance is determined *post-hoc* in Step 1 via a depression intensity score.
-- For each video: `title`, `description`, `tags`, `view_count`, `like_count`, `comment_count` are collected.
-- For each video, the top-N comments sorted by likes are collected, stored with `video_id` as a foreign key.
+Videos are sampled from five predefined content categories, each representing a distinct type of everyday YouTube content. Within each category, videos are ranked by view count and the top-N are selected, ensuring high engagement and broad audience reach — without targeting depression content directly.
+
+| Category | Rationale |
+|----------|-----------|
+| Mental health | Baseline — expected higher depression signal rate |
+| Fitness / wellness | Adjacent to mental health; motivational framing |
+| Music / entertainment | High-traffic mainstream content; general audience |
+| News / current events | Emotionally charged but non-personal framing |
+| Personal vlog | First-person narrative; potential for self-disclosure |
+
+**Per-video collection:** top 50 comments sorted by likes, stored with `video_id` as a foreign key. Target: ~40–50 videos per category, ~200–250 videos total, ~10,000–12,500 comments.
+
+No depression-related keywords are used to filter or rank videos within a category. Depression relevance is determined entirely *post-hoc* at the comment level via NLP in Steps 1 and 2.
 
 ---
 
@@ -118,12 +129,12 @@ python src/modeling.py
 
 ## Limitations
 
-- **Comment ≠ commenter**: commenting under a depression-related video does not imply the commenter has depression.
-- **Top-comment bias**: sorting by likes favors resonant, emotionally salient language.
-- **Selection bias**: high view count ≠ representative sample of all mental health discourse.
-- **No clinical ground truth**: all labels are proxies based on linguistic and behavioral signals.
+- **Comment ≠ commenter**: the presence of depression-indicative language does not imply the commenter has depression.
+- **Top-comment bias**: sorting by likes favors emotionally resonant language over quieter, less-engaged expression.
+- **Category sampling**: the five categories were defined by the research team and do not exhaustively represent all YouTube content.
+- **No clinical ground truth**: all labels are proxies based on linguistic and behavioral signals, not clinical assessment.
 
-Results should be interpreted as detecting *depression-indicative linguistic patterns*, not as clinical or diagnostic claims.
+Results should be interpreted as measuring *the natural prevalence of depression-indicative linguistic patterns in public comment sections*, not as clinical or diagnostic claims.
 
 ---
 
