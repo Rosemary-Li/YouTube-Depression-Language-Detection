@@ -1,0 +1,15 @@
+.env
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Local virtualenvs / conda envs
+.venv/
+.conda/
+venv/
+
+# Step 2 derived artifacts (data/processed/ is committed for sharing)
+data/outputs/
