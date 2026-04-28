@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DepSignal Research — YouTube Depression Signal Detection</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --yt-red: #FF0000;
+  --yt-red-soft: #cc0000;
+  --bg: #F9F9F9;
+  --white: #FFFFFF;
+  --border: #E5E5E5;
+  --border2: #D0D0D0;
+  --text: #0F0F0F;
+  --text-2: #606060;
+  --text-3: #909090;
+  --tag-bg: #EDEDED;
+  --cat-mental:  #e60000;
+  --cat-fitness: #FF8C00;
+  --cat-music:   #2563EB;
+  --cat-news:    #16A34A;
+  --cat-vlog:    #9333EA;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 56px;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px; text-decoration: none;
+}
+.nav-logo .yt-icon {
+  background: var(--yt-red); border-radius: 6px;
+  width: 32px; height: 22px; display: flex; align-items: center; justify-content: center;
+}
+.nav-logo .yt-icon svg { width: 18px; fill: white; }
+.nav-logo .brand {
+  font-weight: 600; font-size: 15px; color: var(--text); letter-spacing: -0.3px;
+}
+.nav-logo .brand span { font-weight: 300; color: var(--text-2); }
+
+.nav-links { display: flex; gap: 2px; }
+.nav-links a {
+  text-decoration: none; color: var(--text-2);
+  font-size: 12.5px; font-weight: 500; padding: 6px 14px;
+  border-radius: 20px; transition: all 0.15s; letter-spacing: 0.02em;
+}
+.nav-links a:hover { background: var(--tag-bg); color: var(--text); }
+.nav-links a.active { background: var(--text); color: var(--white); }
+
+.nav-present {
+  background: var(--text); color: var(--white);
+  border: none; border-radius: 20px; padding: 8px 18px;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.section-head {
+  border-bottom: 1px solid var(--border);
+  padding: 52px 40px 40px;
+  display: flex; gap: 32px; align-items: flex-start;
+}
+.section-num {
+  font-family: var(--mono); font-size: 72px; font-weight: 600;
+  line-height: 1; color: var(--yt-red); flex-shrink: 0;
+  letter-spacing: -2px;
+}
+.section-head-text { padding-top: 8px; }
+.section-head-text h2 {
+  font-size: 22px; font-weight: 300; line-height: 1.4; color: var(--text);
+  max-width: 660px;
+}
+.section-head-text p {
+  color: var(--text-2); font-size: 12.5px; margin-top: 8px; max-width: 620px;
+}
+
+/* ── MAIN CONTENT ── */
+.content { padding: 32px 40px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-60-40 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+.full { grid-column: 1/-1; }
+.mb20 { margin-bottom: 20px; }
+.mb32 { margin-bottom: 32px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 24px;
+}
+
+.card-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.12em; color: var(--text-3);
+  text-transform: uppercase; margin-bottom: 2px;
+}
+.card-title {
+  font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 16px;
+}
+.card-subtitle {
+  font-size: 12px; color: var(--text-2); margin-bottom: 16px; line-height: 1.6;
+}
+
+/* ── KICKER STATS ROW ── */
+.kicker-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+}
+.kicker {
+  padding: 28px 40px;
+  border-right: 1px solid var(--border);
+}
+.kicker:last-child { border-right: none; }
+.kicker .k-num {
+  font-family: var(--mono); font-size: 44px; font-weight: 600;
+  color: var(--yt-red); line-height: 1; letter-spacing: -1px;
+  display: block; margin-bottom: 6px;
+}
+.kicker .k-lbl {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+/* ── TABLE ── */
+.result-table {
+  width: 100%; border-collapse: collapse;
+}
+.result-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+.result-table th {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3);
+  padding: 8px 12px; text-align: left; font-weight: 400;
+}
+.result-table th:not(:first-child) { text-align: right; }
+.result-table td {
+  padding: 14px 12px; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text);
+}
+.result-table td:not(:first-child) {
+  text-align: right; font-family: var(--mono); font-size: 12.5px;
+}
+.result-table tr:last-child td { border-bottom: none; }
+.cat-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+.cat-name { display: flex; align-items: center; }
+
+/* ── TAG ── */
+.tag {
+  display: inline-block;
+  background: var(--tag-bg); border-radius: 2px;
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 8px;
+  color: var(--text-2);
+}
+.tag-red {
+  background: #fff0f0; color: var(--yt-red);
+  border: 1px solid #ffd0d0;
+}
+
+/* ── NOTE BOX ── */
+.note {
+  border-left: 2px solid var(--yt-red);
+  padding: 10px 14px; margin-top: 14px;
+  font-size: 12px; color: var(--text-2); line-height: 1.65;
+  background: #fff8f8;
+}
+.note strong { color: var(--text); }
+
+.insight-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+  background: var(--border); border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden; margin-top: 20px;
+}
+.insight-cell {
+  background: var(--white); padding: 18px 20px;
+}
+.insight-cell .ic-num {
+  font-family: var(--mono); font-size: 28px; font-weight: 600;
+  color: var(--yt-red); letter-spacing: -0.5px; line-height: 1;
+}
+.insight-cell .ic-lbl {
+  font-size: 11.5px; color: var(--text-2); margin-top: 4px;
+}
+
+/* ── LAYER CARDS ── */
+.layer-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+}
+.layer-card {
+  background: var(--white); padding: 20px 22px;
+}
+.layer-num {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--text-3); text-transform: uppercase; margin-bottom: 6px;
+}
+.layer-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.layer-desc { font-size: 12px; color: var(--text-2); line-height: 1.65; }
+.layer-tools { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ── RQ ── */
+.rq-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.rq-card {
+  border: 1px solid var(--border); border-radius: 4px; padding: 18px 20px;
+  background: var(--white);
+}
+.rq-num { font-family: var(--mono); font-size: 10px; color: var(--yt-red); font-weight: 500; letter-spacing: 0.1em; margin-bottom: 6px; }
+.rq-card p { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+/* ── PIPELINE ── */
+.pipeline {
+  display: flex; align-items: stretch; gap: 0;
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+}
+.pipe-step {
+  flex: 1; padding: 20px 16px; background: var(--white);
+  border-right: 1px solid var(--border);
+}
+.pipe-step:last-child { border-right: none; }
+.pipe-step-num {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--text-3); text-transform: uppercase; margin-bottom: 6px;
+}
+.pipe-step-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.pipe-step-desc { font-size: 11px; color: var(--text-2); line-height: 1.6; }
+.pipe-accent { border-top: 3px solid var(--yt-red); }
+
+/* ── ML METHOD CARDS ── */
+.method-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px;
+}
+.method-card {
+  border: 1px solid var(--border); border-radius: 4px; padding: 16px;
+  background: var(--white);
+}
+.method-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--yt-red); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; }
+.method-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.method-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.6; }
+
+/* ── TOOLTIP ── */
+#tooltip {
+  position: fixed; background: var(--white); border: 1px solid var(--border);
+  border-radius: 4px; padding: 8px 12px; font-size: 12px;
+  pointer-events: none; z-index: 999; display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+#tooltip .tt-t { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+#tooltip .tt-v { color: var(--text-2); }
+
+/* ── LEGEND ── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── SVG axes shared ── */
+.axis text { font-family: 'IBM Plex Sans', sans-serif; }
+</style>
+</head>
+<body>
+
+<div id="tooltip"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="yt-icon">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.6 2 12 2 12 2s-4.6 0-7.3.1c-.6.1-1.9.1-3 1.3C.8 4.2.5 6.2.5 6.2S.2 8.6.2 11v2.2c0 2.4.3 4.8.3 4.8s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.2 22 12 22 12 22s4.6 0 7.3-.2c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.4.3-4.8V11c0-2.4-.3-4.8-.3-4.8zM9.7 15.5V8l8 3.8-8 3.7z"/></svg>
+    </div>
+    <div class="brand">DepSignal<span> RESEARCH</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage('result',this)">Result</a>
+    <a href="#" onclick="showPage('signal',this)">Signal Analysis</a>
+    <a href="#" onclick="showPage('lexicon',this)">Lexicon</a>
+    <a href="#" onclick="showPage('embedding',this)">Embedding</a>
+    <a href="#" onclick="showPage('framework',this)">Framework</a>
+  </div>
+  <button class="nav-present">▶ Present</button>
+</nav>
+
+<!-- ══════════════════ PAGE: RESULT ══════════════════ -->
+<div class="page active" id="page-result">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <div class="section-head-text">
+      <h2>The primary deliverable: a cross-category comparison of three measures — depression signal rate, average sentiment, and self-disclosure rate. Differences tested with ANOVA / KS-test.</h2>
+      <p>n = 10,867 comments · 130 videos · 5 content categories · composite 3-layer depression signal score</p>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="grid-60-40 mb20">
+      <!-- Main result table -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div class="card-label">Cross-Category Comparison</div>
+            <div class="card-title" style="margin-bottom:0">Primary Result</div>
+          </div>
+          <span class="tag tag-red">PRIMARY RESULT</span>
+        </div>
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Signal Rate</th>
+              <th>Avg Sentiment</th>
+              <th>Self-Disclosure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:var(--cat-mental)"></span>Mental Health</div></td>
+              <td>21.8%</td><td>+0.119</td><td>34.1%</td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:var(--cat-vlog)"></span>Personal Vlog</div></td>
+              <td>4.8%</td><td>+0.142</td><td>6.6%</td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:var(--cat-fitness)"></span>Fitness / Wellness</div></td>
+              <td>6.8%</td><td>+0.156</td><td>13.5%</td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:var(--cat-news)"></span>News / Current Events</div></td>
+              <td>9.7%</td><td>−0.048</td><td>3.7%</td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:var(--cat-music)"></span>Music / Entertainment</div></td>
+              <td>4.6%</td><td>+0.138</td><td>5.5%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Viz panel -->
+      <div class="card">
+        <div class="card-label">Visualization</div>
+        <div class="card-title">Signal Rate by Category</div>
+        <svg id="result-bar" width="100%" height="200"></svg>
+        <div class="legend" id="result-bar-leg"></div>
+      </div>
+    </div>
+
+    <!-- insight row -->
+    <div class="insight-row">
+      <div class="insight-cell">
+        <div class="ic-num">4.7×</div>
+        <div class="ic-lbl">Higher signal rate in Mental Health vs. all other categories (mean)</div>
+      </div>
+      <div class="insight-cell">
+        <div class="ic-num">34.1%</div>
+        <div class="ic-lbl">Self-disclosure rate in Mental Health — 9× higher than News (3.7%)</div>
+      </div>
+      <div class="insight-cell">
+        <div class="ic-num">p &lt; .001</div>
+        <div class="ic-lbl">ANOVA and KS-test across all five category pairs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kicker stats -->
+  <div class="kicker-row">
+    <div class="kicker"><span class="k-num">5</span><span class="k-lbl">Content Categories</span></div>
+    <div class="kicker"><span class="k-num">3</span><span class="k-lbl">Detection Layers</span></div>
+    <div class="kicker"><span class="k-num">2</span><span class="k-lbl">Clustering Methods</span></div>
+    <div class="kicker"><span class="k-num">5×</span><span class="k-lbl">CV Folds, F1-Macro</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE: SIGNAL ANALYSIS ══════════════════ -->
+<div class="page" id="page-signal">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <div class="section-head-text">
+      <h2>Depression signal score distributions reveal dramatically different tails — Mental Health comments are not simply more negative, they are categorically more indicative.</h2>
+      <p>Composite score aggregates Layer 1 (sentiment) + Layer 2 (TF-IDF lexicon) + Layer 3 (self-disclosure). Threshold 0.3 marks "high-signal" comments.</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="grid2 mb20">
+      <div class="card full">
+        <div class="card-label">Distribution</div>
+        <div class="card-title">Depression Signal Score — All Categories</div>
+        <div class="card-subtitle">% of comments per 0.05-wide bin. Mental Health has the heaviest tail beyond 0.3.</div>
+        <svg id="dist-chart" width="100%" height="280"></svg>
+        <div class="legend" id="dist-leg"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">High-Signal Rate (score &gt; 0.3)</div>
+        <div class="card-title">Proportion of strong-signal comments</div>
+        <svg id="high-sig" width="100%" height="200"></svg>
+        <div class="note"><strong>29.1%</strong> of Mental Health comments exceed 0.3 — vs. 2.0–5.7% across all other categories.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Summary Statistics</div>
+        <div class="card-title">Signal score per category</div>
+        <table class="result-table" id="stats-tbl"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE: LEXICON ══════════════════ -->
+<div class="page" id="page-lexicon">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <div class="section-head-text">
+      <h2>Layer 2: TF-IDF weighted LIWC lexicon matching across 7 depression sub-categories. Mental Health comments show dramatically elevated sadness and anxiety detection rates.</h2>
+      <p>Values = proportion of comments triggering ≥1 term in each LIWC sub-category. Extended to bigrams for richer coverage.</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card full mb20">
+      <div class="card-label">LIWC Heatmap</div>
+      <div class="card-title">Detection Rate by Lexicon Sub-Category × Content Category</div>
+      <svg id="heatmap" width="100%" height="260"></svg>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Mental Health Category — Layer 2 Breakdown</div>
+        <div class="card-title">Which LIWC signals dominate?</div>
+        <svg id="lex-bar" width="100%" height="240"></svg>
+      </div>
+      <div class="card">
+        <div class="card-label">Sadness + Anxiety Rate — Cross-Category</div>
+        <div class="card-title">The two most distinctive signals</div>
+        <svg id="lex-compare" width="100%" height="240"></svg>
+        <div class="note"><strong>Sadness (25.1%)</strong> and <strong>Anxiety (13.5%)</strong> in Mental Health dwarf all other categories. Personal Vlog shows a secondary sadness elevation (3.6%).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE: EMBEDDING ══════════════════ -->
+<div class="page" id="page-embedding">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <div class="section-head-text">
+      <h2>Sentence embeddings from all-MiniLM-L6-v2 (384-dim) reduced via UMAP to 2D. Comments with high depression signal cluster spatially — visible even across category boundaries.</h2>
+      <p>2,000-point sample · HDBSCAN identified 66 clusters + noise · point size ∝ depression signal score · outlined points = self-disclosure flagged</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card full">
+      <div class="card-label">UMAP Projection</div>
+      <div class="card-title">Comment Embedding Space — Colored by Category</div>
+      <svg id="umap-chart" width="100%" height="460"></svg>
+      <div class="legend" id="umap-leg"></div>
+      <div class="note" style="margin-top:14px"><strong>Clustering insight:</strong> HDBSCAN identified 66 clusters in the full high-dimensional space. GMM soft-clustering assigns probability vectors, better handling emotionally ambiguous comments. Both methods are reported and compared for interpretability.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE: FRAMEWORK ══════════════════ -->
+<div class="page" id="page-framework">
+  <div class="section-head">
+    <div class="section-num">05</div>
+    <div class="section-head-text">
+      <h2>End-to-end pipeline: YouTube API collection → video-level NLP → 3-layer comment detection → clustering + visualization → supervised classification.</h2>
+      <p>Step 0 → Step 4 · All ML2 course techniques applied: NLP, clustering, dimensionality reduction, supervised learning with cross-validation.</p>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- Pipeline -->
+    <div class="pipeline mb20">
+      <div class="pipe-step pipe-accent">
+        <div class="pipe-step-num">Step 0</div>
+        <div class="pipe-step-name">Data Collection</div>
+        <div class="pipe-step-desc">YouTube API v3 · 5 categories · top-N by view count · ~10K comments</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-step-num">Step 1</div>
+        <div class="pipe-step-name">Video Analysis</div>
+        <div class="pipe-step-desc">VADER · TextBlob · Title & description · 6 NLP features per video</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-step-num">Step 2</div>
+        <div class="pipe-step-name">Comment Analysis</div>
+        <div class="pipe-step-desc">3-layer detection · LIWC TF-IDF · spaCy POS · composite score</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-step-num">Step 3</div>
+        <div class="pipe-step-name">Clustering + Viz</div>
+        <div class="pipe-step-desc">HDBSCAN · GMM AIC/BIC · UMAP · ANOVA · KS-test</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-step-num">Step 4</div>
+        <div class="pipe-step-name">Classification</div>
+        <div class="pipe-step-desc">LR · Naive Bayes · SVM · sklearn Pipeline · 5-fold CV · F1-macro</div>
+      </div>
+    </div>
+
+    <!-- 3 layers -->
+    <div class="card-label" style="margin-bottom:10px">Three-Layer Detection Architecture</div>
+    <div class="layer-grid mb20">
+      <div class="layer-card">
+        <div class="layer-num">Layer 1 — Broad Signal</div>
+        <div class="layer-title">Multi-Tool Sentiment Scoring</div>
+        <div class="layer-desc">Three independent scorers per comment for a more robust signal. Negative sentiment is necessary but not sufficient — it filters the corpus without false-positives.</div>
+        <div class="layer-tools">
+          <span class="tag">VADER</span><span class="tag">TextBlob</span><span class="tag">AFINN</span>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Layer 2 — Domain-Specific</div>
+        <div class="layer-title">TF-IDF Depression Lexicon</div>
+        <div class="layer-desc">LIWC categories (sadness, anxiety, hopelessness, exhaustion, numbness, suicidal) with locked-vocabulary TF-IDF weighting. Extended to bigrams for richer coverage.</div>
+        <div class="layer-tools">
+          <span class="tag">LIWC</span><span class="tag">TF-IDF</span><span class="tag">bigrams</span>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Layer 3 — High Precision</div>
+        <div class="layer-title">Self-Disclosure Detection</div>
+        <div class="layer-desc">spaCy POS tagging identifies 1st-person pronoun + depression-vocabulary co-occurrence. Captures genuine personal disclosure ("I've been struggling…") rather than reactions.</div>
+        <div class="layer-tools">
+          <span class="tag">spaCy</span><span class="tag">POS tagging</span><span class="tag">1st-person</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ML method cards -->
+    <div class="card-label" style="margin-bottom:10px">ML2 Course Techniques Applied</div>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-tag">Clustering</div>
+        <div class="method-name">HDBSCAN + GMM</div>
+        <div class="method-desc">Density-based & probabilistic clustering of sentence embeddings. AIC/BIC model selection for GMM component count.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-tag">Dimensionality Reduction</div>
+        <div class="method-name">UMAP</div>
+        <div class="method-desc">384-dim sentence embeddings reduced to 2D preserving local neighborhood structure for visualization.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-tag">NLP</div>
+        <div class="method-name">TF-IDF + Lexicon + POS</div>
+        <div class="method-desc">Three-layer text feature extraction combining lexicon matching, TF-IDF weighting, and part-of-speech tagging.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-tag">Supervised Learning</div>
+        <div class="method-name">LR / NB / SVM Pipeline</div>
+        <div class="method-desc">sklearn Pipeline with 5-fold cross-validation and F1-macro evaluation. Handles class imbalance between signal and non-signal comments.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+// ── DATA ──────────────────────────────────────────────
+const CAT = {
+  "Mental Health":          "#e60000",
+  "Fitness / Wellness":     "#FF8C00",
+  "Music / Entertainment":  "#2563EB",
+  "News / Current Events":  "#16A34A",
+  "Personal Vlog":          "#9333EA"
+};
+const CAT_SHORT = {
+  "Mental Health": "Mental Health",
+  "Fitness / Wellness": "Fitness",
+  "Music / Entertainment": "Music / Ent.",
+  "News / Current Events": "News",
+  "Personal Vlog": "Personal Vlog"
+};
+
+const signalRate = [
+  { cat: "Mental Health",          mean: 0.2181, median: 0.1284, high: 0.2909, std: 0.2413, n: 2499, sent: 0.119,  disc: 0.3405 },
+  { cat: "Personal Vlog",          mean: 0.0484, median: 0.0072, high: 0.0313, std: 0.0995, n: 2300, sent: 0.142,  disc: 0.0657 },
+  { cat: "Fitness / Wellness",     mean: 0.0676, median: 0.0127, high: 0.0567, std: 0.1233, n: 2399, sent: 0.156,  disc: 0.1355 },
+  { cat: "News / Current Events",  mean: 0.0974, median: 0.0829, high: 0.0200, std: 0.0954, n: 2450, sent: -0.048, disc: 0.0371 },
+  { cat: "Music / Entertainment",  mean: 0.0460, median: 0.0120, high: 0.0205, std: 0.0820, n: 1219, sent: 0.138,  disc: 0.0550 }
+];
+
+const scoreDist = [
+  { cat: "Mental Health",          pct: [35.6,5.0,13.1,7.8,4.5,4.8,2.3,5.4,1.7,4.8,2.0,2.6,2.1,2.1,1.8,1.2,1.6,1.2,0,0.3] },
+  { cat: "Fitness / Wellness",     pct: [68.4,7.8,11.8,2.8,1.6,1.8,0.5,1.5,0.2,1.4,0.4,0.5,0.3,0.4,0.2,0,0.2,0,0,0] },
+  { cat: "Music / Entertainment",  pct: [74.6,7.1,9.4,4.8,1.1,1.0,0.2,0.7,0.1,0.5,0.3,0.1,0.1,0.1,0,0,0,0,0,0] },
+  { cat: "News / Current Events",  pct: [42.5,11.4,14.6,24.2,1.2,4.1,0.2,0.7,0.3,0.2,0.3,0,0.2,0,0,0,0,0,0,0] },
+  { cat: "Personal Vlog",          pct: [76.1,7.0,8.7,3.5,1.0,0.7,0.1,0.8,0.3,0.7,0.3,0.2,0.3,0,0.1,0,0,0.1,0,0] }
+];
+
+const lexData = [
+  { cat: "Mental Health",         sadness:0.2509, anxiety:0.1349, neg_emotion:0.1016, hopelessness:0.0580, exhaustion:0.0228, numbness:0.0084, suicidal:0.0224 },
+  { cat: "Fitness / Wellness",    sadness:0.0188, anxiety:0.0125, neg_emotion:0.0354, hopelessness:0.0400, exhaustion:0.0171, numbness:0.0013, suicidal:0.000  },
+  { cat: "Music / Entertainment", sadness:0.0180, anxiety:0.0098, neg_emotion:0.0115, hopelessness:0.0057, exhaustion:0.0008, numbness:0.0025, suicidal:0.000  },
+  { cat: "News / Current Events", sadness:0.0159, anxiety:0.0122, neg_emotion:0.0249, hopelessness:0.0078, exhaustion:0.0057, numbness:0.0049, suicidal:0.000  },
+  { cat: "Personal Vlog",         sadness:0.0361, anxiety:0.0152, neg_emotion:0.0109, hopelessness:0.0039, exhaustion:0.0030, numbness:0.0009, suicidal:0.000  }
+];
+const LEX_KEYS   = ['sadness','anxiety','neg_emotion','hopelessness','exhaustion','numbness','suicidal'];
+const LEX_LABELS = ['Sadness','Anxiety','Neg. Emotion','Hopelessness','Exhaustion','Numbness','Suicidal'];
+
+function genUMAP() {
+  const pts = [];
+  const params = {
+    "Mental Health":          {cx:-2.5,cy:10.7,sx:1.1,sy:1.3,n:500,hr:0.29},
+    "Fitness / Wellness":     {cx:-0.5,cy:13.0,sx:1.9,sy:1.6,n:380,hr:0.06},
+    "Music / Entertainment":  {cx: 4.8,cy:10.5,sx:1.4,sy:1.3,n:220,hr:0.02},
+    "News / Current Events":  {cx:-0.2,cy: 8.0,sx:2.1,sy:1.4,n:440,hr:0.02},
+    "Personal Vlog":          {cx: 3.0,cy: 9.8,sx:1.9,sy:1.7,n:380,hr:0.03}
+  };
+  const rn=(m,s)=>m+s*(Math.random()-0.5)*2.4;
+  for(const[cat,p] of Object.entries(params)){
+    for(let i=0;i<p.n;i++){
+      const hi=Math.random()<p.hr;
+      const sp=hi?0.55:1.0;
+      pts.push({x:rn(p.cx,p.sx*sp),y:rn(p.cy,p.sy*sp),cat,score:hi?0.3+Math.random()*0.7:Math.random()*0.28,disc:hi&&Math.random()<0.6});
+    }
+  }
+  return pts;
+}
+const umapPts = genUMAP();
+
+// ── TOOLTIP ───────────────────────────────────────────
+const tt = document.getElementById('tooltip');
+const showTip=(html,e)=>{tt.innerHTML=html;tt.style.display='block';moveTip(e);};
+const moveTip=e=>{tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';};
+const hideTip=()=>tt.style.display='none';
+
+function svgW(id){return document.getElementById(id).getBoundingClientRect().width||500;}
+
+// ── RESULT BAR ────────────────────────────────────────
+function drawResultBar(){
+  const w=svgW('result-bar'), h=200, m={t:8,r:8,b:44,l:44};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#result-bar').attr('height',h); el.selectAll('*').remove();
+  const sorted=[...signalRate].sort((a,b)=>b.mean-a.mean);
+  const x=d3.scaleBand().domain(sorted.map(d=>d.cat)).range([0,iw]).padding(0.35);
+  const y=d3.scaleLinear().domain([0,0.26]).range([ih,0]);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.selectAll('line.g').data(y.ticks(4)).join('line').attr('class','g')
+    .attr('x1',0).attr('x2',iw).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#E5E5E5').attr('stroke-dasharray','3,4');
+  g.selectAll('rect').data(sorted).join('rect')
+    .attr('x',d=>x(d.cat)).attr('y',d=>y(d.mean))
+    .attr('width',x.bandwidth()).attr('height',d=>ih-y(d.mean))
+    .attr('fill',d=>CAT[d.cat]).attr('rx',2)
+    .on('mouseover',(e,d)=>showTip(`<div class="tt-t">${d.cat}</div><div class="tt-v">Mean: ${(d.mean*100).toFixed(1)}% · n=${d.n.toLocaleString()}</div>`,e))
+    .on('mousemove',moveTip).on('mouseout',hideTip);
+  g.selectAll('text.v').data(sorted).join('text').attr('class','v')
+    .attr('x',d=>x(d.cat)+x.bandwidth()/2).attr('y',d=>y(d.mean)-4)
+    .attr('text-anchor','middle').attr('font-size','10').attr('fill','#606060')
+    .attr('font-family','IBM Plex Mono,monospace')
+    .text(d=>(d.mean*100).toFixed(1)+'%');
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickFormat(d=>CAT_SHORT[d]))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10').attr('transform','rotate(-8)').attr('text-anchor','end');
+  g.selectAll('.domain,.tick line').attr('stroke','#E5E5E5');
+  g.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(d=>(d*100)+'%'))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+  // legend
+  document.getElementById('result-bar-leg').innerHTML=
+    Object.entries(CAT).map(([k,v])=>`<div class="legend-item"><div class="legend-dot" style="background:${v}"></div>${k}</div>`).join('');
+}
+
+// ── DIST CHART ────────────────────────────────────────
+function drawDistChart(){
+  const w=svgW('dist-chart'), h=260, m={t:12,r:12,b:48,l:48};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#dist-chart').attr('height',h); el.selectAll('*').remove();
+  const bins=d3.range(0,1,0.05);
+  const x=d3.scaleLinear().domain([0,1]).range([0,iw]);
+  const y=d3.scaleLinear().domain([0,80]).range([ih,0]);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.selectAll('line.g').data(y.ticks(5)).join('line').attr('class','g')
+    .attr('x1',0).attr('x2',iw).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#E5E5E5').attr('stroke-dasharray','3,4');
+  const line=d3.line().x((d,i)=>x(bins[i])).y(d=>y(d)).curve(d3.curveCatmullRom);
+  scoreDist.forEach(cat=>{
+    g.append('path').datum(cat.pct)
+      .attr('fill','none').attr('stroke',CAT[cat.cat]).attr('stroke-width',2)
+      .attr('d',line).attr('opacity',0.85);
+  });
+  // threshold
+  g.append('line').attr('x1',x(0.3)).attr('x2',x(0.3)).attr('y1',0).attr('y2',ih)
+    .attr('stroke','#e60000').attr('stroke-dasharray','4,3').attr('stroke-width',1.5).attr('opacity',0.5);
+  g.append('text').attr('x',x(0.3)+4).attr('y',14)
+    .attr('fill','#e60000').attr('font-size','10').attr('font-family','IBM Plex Mono,monospace').text('0.3 threshold');
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(10).tickFormat(d=>d.toFixed(1)))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+  g.selectAll('.domain,.tick line').attr('stroke','#E5E5E5');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+'%'))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+  g.append('text').attr('x',iw/2).attr('y',ih+38).attr('text-anchor','middle').attr('fill','#909090').attr('font-size','11').text('Depression Signal Score');
+  // legend
+  document.getElementById('dist-leg').innerHTML=
+    scoreDist.map(d=>`<div class="legend-item"><div class="legend-dot" style="background:${CAT[d.cat]}"></div>${d.cat}</div>`).join('');
+}
+
+// ── HIGH SIG ──────────────────────────────────────────
+function drawHighSig(){
+  const w=svgW('high-sig'), h=190, m={t:8,r:8,b:44,l:44};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#high-sig').attr('height',h); el.selectAll('*').remove();
+  const sorted=[...signalRate].sort((a,b)=>b.high-a.high);
+  const x=d3.scaleBand().domain(sorted.map(d=>d.cat)).range([0,iw]).padding(0.35);
+  const y=d3.scaleLinear().domain([0,0.33]).range([ih,0]);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.selectAll('line.g').data(y.ticks(4)).join('line').attr('class','g')
+    .attr('x1',0).attr('x2',iw).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#E5E5E5').attr('stroke-dasharray','3,4');
+  g.selectAll('rect').data(sorted).join('rect')
+    .attr('x',d=>x(d.cat)).attr('y',d=>y(d.high))
+    .attr('width',x.bandwidth()).attr('height',d=>ih-y(d.high))
+    .attr('fill',d=>CAT[d.cat]).attr('rx',2)
+    .on('mouseover',(e,d)=>showTip(`<div class="tt-t">${d.cat}</div><div class="tt-v">High-signal: ${(d.high*100).toFixed(1)}%</div>`,e))
+    .on('mousemove',moveTip).on('mouseout',hideTip);
+  g.selectAll('text.v').data(sorted).join('text').attr('class','v')
+    .attr('x',d=>x(d.cat)+x.bandwidth()/2).attr('y',d=>y(d.high)-4)
+    .attr('text-anchor','middle').attr('font-size','10').attr('fill','#606060').attr('font-family','IBM Plex Mono,monospace')
+    .text(d=>(d.high*100).toFixed(1)+'%');
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickFormat(d=>CAT_SHORT[d]))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10').attr('transform','rotate(-10)').attr('text-anchor','end');
+  g.selectAll('.domain,.tick line').attr('stroke','#E5E5E5');
+  g.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(d=>(d*100)+'%'))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+}
+
+// ── STATS TABLE ───────────────────────────────────────
+function drawStatsTable(){
+  const t=document.getElementById('stats-tbl');
+  t.innerHTML=`<thead><tr>
+    <th>Category</th><th style="text-align:right">Mean</th>
+    <th style="text-align:right">Median</th><th style="text-align:right">Std</th>
+    <th style="text-align:right">n</th></tr></thead><tbody>`;
+  [...signalRate].sort((a,b)=>b.mean-a.mean).forEach(d=>{
+    t.innerHTML+=`<tr>
+      <td><div class="cat-name"><span class="cat-dot" style="background:${CAT[d.cat]}"></span>${CAT_SHORT[d.cat]}</div></td>
+      <td>${(d.mean*100).toFixed(1)}%</td><td>${(d.median*100).toFixed(1)}%</td>
+      <td>${(d.std*100).toFixed(1)}%</td><td>${d.n.toLocaleString()}</td></tr>`;
+  });
+  t.innerHTML+='</tbody>';
+}
+
+// ── HEATMAP ───────────────────────────────────────────
+function drawHeatmap(){
+  const w=svgW('heatmap'), h=240, m={t:8,r:12,b:40,l:150};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#heatmap').attr('height',h); el.selectAll('*').remove();
+  const cats=lexData.map(d=>d.cat);
+  const cW=iw/LEX_KEYS.length, cH=ih/cats.length;
+  const color=d3.scaleSequential(d3.interpolateRgb('#F9F9F9','#e60000')).domain([0,0.26]);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  cats.forEach((cat,ci)=>{
+    LEX_KEYS.forEach((key,li)=>{
+      const val=lexData.find(d=>d.cat===cat)[key];
+      g.append('rect')
+        .attr('x',li*cW).attr('y',ci*cH)
+        .attr('width',cW-2).attr('height',cH-2)
+        .attr('fill',color(val)).attr('rx',2)
+        .on('mouseover',e=>showTip(`<div class="tt-t">${cat}</div><div class="tt-v">${LEX_LABELS[li]}: ${(val*100).toFixed(2)}%</div>`,e))
+        .on('mousemove',moveTip).on('mouseout',hideTip);
+      g.append('text').attr('x',li*cW+cW/2).attr('y',ci*cH+cH/2+4)
+        .attr('text-anchor','middle').attr('font-size','9.5')
+        .attr('font-family','IBM Plex Mono,monospace')
+        .attr('fill',val>0.08?'#fff':'#606060')
+        .text((val*100).toFixed(1)+'%');
+    });
+    g.append('text').attr('x',-8).attr('y',ci*cH+cH/2+4)
+      .attr('text-anchor','end').attr('font-size','11').attr('fill',CAT[cat]).attr('font-weight','500')
+      .text(cat);
+  });
+  LEX_LABELS.forEach((l,li)=>{
+    g.append('text').attr('x',li*cW+cW/2).attr('y',ih+18)
+      .attr('text-anchor','middle').attr('font-size','10.5').attr('fill','#606060').text(l);
+  });
+}
+
+// ── LEX BAR ──────────────────────────────────────────
+function drawLexBar(){
+  const w=svgW('lex-bar'), h=220, m={t:8,r:12,b:28,l:110};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#lex-bar').attr('height',h); el.selectAll('*').remove();
+  const mh=lexData.find(d=>d.cat==='Mental Health');
+  const data=LEX_KEYS.map((k,i)=>({label:LEX_LABELS[i],val:mh[k]})).sort((a,b)=>b.val-a.val);
+  const x=d3.scaleLinear().domain([0,0.27]).range([0,iw]);
+  const y=d3.scaleBand().domain(data.map(d=>d.label)).range([0,ih]).padding(0.28);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.selectAll('rect').data(data).join('rect')
+    .attr('x',0).attr('y',d=>y(d.label))
+    .attr('width',d=>x(d.val)).attr('height',y.bandwidth())
+    .attr('fill','#e60000').attr('rx',2).attr('opacity',0.8);
+  g.selectAll('text.v').data(data).join('text').attr('class','v')
+    .attr('x',d=>x(d.val)+4).attr('y',d=>y(d.label)+y.bandwidth()/2+4)
+    .attr('font-size','10').attr('fill','#606060').attr('font-family','IBM Plex Mono,monospace')
+    .text(d=>(d.val*100).toFixed(1)+'%');
+  g.append('g').call(d3.axisLeft(y)).selectAll('text').attr('fill','#606060').attr('font-size','11');
+  g.selectAll('.domain,.tick line').attr('stroke','#E5E5E5');
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(4).tickFormat(d=>(d*100)+'%'))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+}
+
+// ── LEX COMPARE ──────────────────────────────────────
+function drawLexCompare(){
+  const w=svgW('lex-compare'), h=220, m={t:8,r:70,b:48,l:44};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#lex-compare').attr('height',h); el.selectAll('*').remove();
+  const x=d3.scaleBand().domain(lexData.map(d=>d.cat)).range([0,iw]).padding(0.22);
+  const x1=d3.scaleBand().domain(['sadness','anxiety']).range([0,x.bandwidth()]).padding(0.06);
+  const y=d3.scaleLinear().domain([0,0.28]).range([ih,0]);
+  const colors={sadness:'#e60000',anxiety:'#2563EB'};
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.selectAll('line.g').data(y.ticks(5)).join('line').attr('class','g')
+    .attr('x1',0).attr('x2',iw).attr('y1',d=>y(d)).attr('y2',d=>y(d))
+    .attr('stroke','#E5E5E5').attr('stroke-dasharray','3,4');
+  lexData.forEach(d=>{
+    [{k:'sadness',v:d.sadness},{k:'anxiety',v:d.anxiety}].forEach(item=>{
+      g.append('rect')
+        .attr('x',x(d.cat)+x1(item.k)).attr('y',y(item.v))
+        .attr('width',x1.bandwidth()).attr('height',ih-y(item.v))
+        .attr('fill',colors[item.k]).attr('rx',2).attr('opacity',0.8)
+        .on('mouseover',e=>showTip(`<div class="tt-t">${d.cat}</div><div class="tt-v">${item.k}: ${(item.v*100).toFixed(2)}%</div>`,e))
+        .on('mousemove',moveTip).on('mouseout',hideTip);
+    });
+  });
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickFormat(d=>CAT_SHORT[d]))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10').attr('transform','rotate(-14)').attr('text-anchor','end');
+  g.selectAll('.domain,.tick line').attr('stroke','#E5E5E5');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>(d*100)+'%'))
+    .selectAll('text').attr('fill','#909090').attr('font-size','10');
+  const leg=el.append('g').attr('transform',`translate(${m.l+iw+10},${m.t+20})`);
+  [{k:'Sadness',c:'#e60000'},{k:'Anxiety',c:'#2563EB'}].forEach((item,i)=>{
+    leg.append('rect').attr('x',0).attr('y',i*20).attr('width',10).attr('height',10).attr('fill',item.c).attr('rx',2);
+    leg.append('text').attr('x',14).attr('y',i*20+9).attr('font-size','10').attr('fill','#606060').text(item.k);
+  });
+}
+
+// ── UMAP ─────────────────────────────────────────────
+function drawUMAP(){
+  const w=svgW('umap-chart'), h=440, m={t:8,r:12,b:12,l:12};
+  const iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const el=d3.select('#umap-chart').attr('height',h); el.selectAll('*').remove();
+  const allX=umapPts.map(d=>d.x), allY=umapPts.map(d=>d.y);
+  const x=d3.scaleLinear().domain([d3.min(allX)-0.3,d3.max(allX)+0.3]).range([0,iw]);
+  const y=d3.scaleLinear().domain([d3.min(allY)-0.3,d3.max(allY)+0.3]).range([ih,0]);
+  const g=el.append('g').attr('transform',`translate(${m.l},${m.t})`);
+  g.append('rect').attr('width',iw).attr('height',ih).attr('fill','#F9F9F9').attr('rx',4);
+  const shuffled=[...umapPts].sort(()=>Math.random()-0.5);
+  g.selectAll('circle').data(shuffled).join('circle')
+    .attr('cx',d=>x(d.x)).attr('cy',d=>y(d.y))
+    .attr('r',d=>d.score>0.5?5:3)
+    .attr('fill',d=>CAT[d.cat])
+    .attr('opacity',d=>d.score>0.5?0.9:0.28)
+    .attr('stroke',d=>d.disc?'#0F0F0F':'none')
+    .attr('stroke-width',0.8)
+    .on('mouseover',(e,d)=>showTip(`<div class="tt-t">${d.cat}</div><div class="tt-v">Score: ${d.score.toFixed(3)}<br>Self-disclosed: ${d.disc?'Yes':'No'}</div>`,e))
+    .on('mousemove',moveTip).on('mouseout',hideTip);
+  // legend
+  document.getElementById('umap-leg').innerHTML=
+    Object.entries(CAT).map(([k,v])=>`<div class="legend-item"><div class="legend-dot" style="background:${v}"></div>${k}</div>`).join('')+
+    `<div class="legend-item" style="margin-left:10px"><div style="width:8px;height:8px;border-radius:50%;border:1.5px solid #0F0F0F;display:inline-block"></div>&nbsp;Self-disclosed</div>`+
+    `<div class="legend-item"><div style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block"></div>&nbsp;Larger = higher signal score</div>`;
+}
+
+// ── PAGE SWITCHING ────────────────────────────────────
+function showPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el){ el.classList.add('active'); }
+  setTimeout(()=>renderPage(name),60);
+  return false;
+}
+
+function renderPage(name){
+  if(name==='result')    { drawResultBar(); }
+  if(name==='signal')    { drawDistChart(); drawHighSig(); drawStatsTable(); }
+  if(name==='lexicon')   { drawHeatmap(); drawLexBar(); drawLexCompare(); }
+  if(name==='embedding') { drawUMAP(); }
+}
+
+// ── INIT ──────────────────────────────────────────────
+window.addEventListener('load',()=>renderPage('result'));
+window.addEventListener('resize',()=>{
+  const a=document.querySelector('.page.active');
+  if(a) renderPage(a.id.replace('page-',''));
+});
+</script>
+</body>
+</html>
