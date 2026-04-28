@@ -1,32 +1,3 @@
-"""
-modeling.py - Step 4: Supervised classification
-
-Goal:
-  Train 3 classifiers to predict whether a comment contains a depression signal.
-  Use 5-fold CV with F1-macro (handles class imbalance).
-
-Label:
-  We have no manual labels, so we use Step 2's `self_disclosure_flag` as a
-  weak label (the highest-precision layer per the README).
-
-Models (sklearn Pipeline = TF-IDF -> classifier):
-  - Logistic Regression
-  - Multinomial Naive Bayes
-  - Linear SVM
-
-Inputs:
-  data/processed/comment_features.csv   (text + self_disclosure_flag)
-
-Outputs (data/outputs/):
-  model_results.json         per-model CV scores + per-fold detail
-  model_comparison.png       bar chart of F1-macro across models
-  confusion_matrices.png     3 confusion matrices side by side
-  top_features.csv           top positive/negative TF-IDF terms (LogReg)
-
-Usage:
-  python src/modeling.py
-"""
-
 from __future__ import annotations
 
 import json
@@ -52,13 +23,12 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 
-# ---- paths ----
+
 ROOT          = Path(__file__).resolve().parents[1]
 COMMENTS_CSV  = ROOT / "data" / "processed" / "comment_features.csv"
 OUT_DIR       = ROOT / "data" / "outputs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---- logging ----
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-7s | %(message)s",
@@ -70,9 +40,7 @@ RANDOM_STATE = 42
 N_FOLDS = 5
 
 
-# ---- TF-IDF settings shared across all models ----
 def make_tfidf() -> TfidfVectorizer:
-    # word + bigram, drop very rare and very common terms
     return TfidfVectorizer(
         ngram_range=(1, 2),
         min_df=3,
@@ -106,12 +74,10 @@ def build_pipelines() -> dict[str, Pipeline]:
 
 
 def evaluate_model(name: str, pipe: Pipeline, X, y, cv) -> dict:
-    """Run CV scoring and CV prediction; return summary + per-fold detail."""
+
     log.info("[%s] running %d-fold CV ...", name, N_FOLDS)
     f1_scores  = cross_val_score(pipe, X, y, cv=cv, scoring="f1_macro", n_jobs=-1)
     acc_scores = cross_val_score(pipe, X, y, cv=cv, scoring="accuracy", n_jobs=-1)
-
-    # CV predictions for confusion matrix + precision/recall on positive class
     y_pred = cross_val_predict(pipe, X, y, cv=cv, n_jobs=-1)
     prec = precision_score(y, y_pred, pos_label=1, zero_division=0)
     rec  = recall_score(y, y_pred, pos_label=1, zero_division=0)
@@ -179,7 +145,6 @@ def plot_confusion_matrices(results: list[dict], out_path: Path) -> None:
 
 
 def export_top_features(pipe: Pipeline, X, y, out_path: Path, top_n: int = 20) -> None:
-    """Refit LogReg on all data and dump top positive / negative TF-IDF terms."""
     pipe.fit(X, y)
     vec  = pipe.named_steps["tfidf"]
     clf  = pipe.named_steps["clf"]
@@ -220,16 +185,16 @@ def main() -> None:
     for name, pipe in pipelines.items():
         results.append(evaluate_model(name, pipe, X, y, cv))
 
-    # --- save outputs ---
+    #save outputs
     plot_model_comparison(results, OUT_DIR / "model_comparison.png")
     plot_confusion_matrices(results, OUT_DIR / "confusion_matrices.png")
 
-    # top features (LogReg, easiest to interpret)
+    #top features
     log.info("Extracting top features from LogisticRegression ...")
     export_top_features(pipelines["LogisticRegression"], X, y,
                         OUT_DIR / "top_features.csv")
 
-    # write JSON (drop large per-row predictions to keep file small)
+    # write JSON
     json_results = []
     for r in results:
         r_copy = {k: v for k, v in r.items() if k != "cv_predictions"}
@@ -245,21 +210,6 @@ def main() -> None:
     with open(OUT_DIR / "model_results.json", "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
     log.info("  -> %s", OUT_DIR / "model_results.json")
-
-    # --- final summary table ---
-    log.info("-" * 60)
-    log.info("Final results")
-    print(pd.DataFrame([
-        {
-            "model":     r["model"],
-            "f1_macro":  f"{r['f1_macro_mean']:.4f} ± {r['f1_macro_std']:.4f}",
-            "accuracy":  f"{r['accuracy_mean']:.4f}",
-            "precision": f"{r['precision_pos']:.3f}",
-            "recall":    f"{r['recall_pos']:.3f}",
-            "f1_pos":    f"{r['f1_pos']:.3f}",
-        } for r in results
-    ]).to_string(index=False))
-
 
 if __name__ == "__main__":
     main()

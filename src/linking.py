@@ -1,51 +1,3 @@
-"""
-linking.py — Step 3: Cross-Category Comparison & Visualization
-═══════════════════════════════════════════════════════════════════════════════
-
-
-Inputs
-──────
-  data/processed/comment_features.csv     (Step 2 output, ~10.8k rows)
-  data/processed/comment_embeddings.npy   (Step 2 output, MiniLM embeddings)
-  data/processed/video_features.csv       (Step 1, mental_health / fitness / music)
-  data/processed/video_features_KL.csv    (Step 1, news / personal_vlog)
-
-Outputs (written to data/outputs/)
-──────
-  category_summary.csv             per-category descriptive stats
-  category_heatmap.png             5 × N feature heatmap by category
-  signal_distribution.png          KDE / box plots of depression_signal_score
-  cluster_category_heatmap.png     cluster × category contingency (row-normalized)
-  tsne_by_category.png             PCA(50)→t-SNE(2) coloured by category
-  tsne_by_cluster_hdbscan.png      same projection coloured by HDBSCAN label
-  tsne_by_cluster_gmm.png          same projection coloured by GMM soft-label
-  gmm_model_selection.png          AIC / BIC vs n_components
-  stats_tests.json                 ANOVA + pairwise KS-test results
-  comment_with_clusters.csv        per-comment cluster labels & 2-D coords
-
-Pipeline
-────────
-  1. Load Step 2 comment features and embeddings; merge Step 1 video features.
-  2. Descriptive comparison across 5 categories (signal rate, sentiment,
-     self-disclosure, lex hits).
-  3. Dim-reduction pipeline: PCA → 50D → t-SNE → 2D
-     (cleaner separation than direct 2-D, see README Step 3).
-  4. Clustering:
-       • HDBSCAN — density-based, no fixed k.
-       • GMM — soft clustering; n_components chosen by AIC/BIC.
-  5. Statistical tests:
-       • One-way ANOVA on depression_signal_score across 5 categories.
-       • Pairwise KS-test on signal-score distributions.
-
-Usage
-─────
-  python src/linking.py [--sample N] [--no-embeddings]
-
-  --sample N       : subsample N comments before clustering / t-SNE (debug).
-  --no-embeddings  : skip embedding-based steps; only run descriptive +
-                     statistical comparison (fast).
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -63,7 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.mixture import GaussianMixture
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
+
 ROOT             = Path(__file__).resolve().parents[1]
 PROCESSED_DIR    = ROOT / "data" / "processed"
 COMMENTS_FEATS   = PROCESSED_DIR / "comment_features.csv"
@@ -74,7 +26,6 @@ VIDEO_FEATS_B    = PROCESSED_DIR / "video_features_KL.csv"
 OUT_DIR          = ROOT / "data" / "outputs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-7s | %(message)s",
@@ -82,7 +33,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("linking")
 
-# Fixed category order for every plot / table
 CATEGORY_ORDER = [
     "mental_health",
     "personal_vlog",
@@ -99,9 +49,6 @@ CATEGORY_PALETTE = {
 }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Load + merge
-# ─────────────────────────────────────────────────────────────────────────────
 def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     log.info("Loading comment features: %s", COMMENTS_FEATS)
     comments = pd.read_csv(COMMENTS_FEATS)
@@ -112,15 +59,12 @@ def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     v_b = pd.read_csv(VIDEO_FEATS_B)
     videos = pd.concat([v_a, v_b], ignore_index=True).drop_duplicates("video_id")
     log.info("  %d videos × %d columns", *videos.shape)
-
-    # Confirm all 5 categories present
     cats_present = sorted(videos["category"].unique())
     log.info("  video categories: %s", cats_present)
     return comments, videos
 
 
 def merge_video_context(comments: pd.DataFrame, videos: pd.DataFrame) -> pd.DataFrame:
-    """Join video-level framing features onto each comment via video_id."""
     keep = [
         "video_id", "title_sentiment", "desc_vader", "desc_polarity",
         "desc_subjectivity", "desc_word_count", "desc_lexical_diversity",
@@ -129,12 +73,7 @@ def merge_video_context(comments: pd.DataFrame, videos: pd.DataFrame) -> pd.Data
     log.info("Merged → %d rows × %d columns", *merged.shape)
     return merged
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Descriptive cross-category comparison
-# ─────────────────────────────────────────────────────────────────────────────
 def category_summary(df: pd.DataFrame) -> pd.DataFrame:
-    # Global top-10% threshold so the column actually varies across categories
     global_top10 = df["depression_signal_score"].quantile(0.90)
     g = df.groupby("category")
     summary = pd.DataFrame({
@@ -206,9 +145,6 @@ def plot_signal_distribution(df: pd.DataFrame, out_path: Path) -> None:
     log.info("  → %s", out_path)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Statistical tests
-# ─────────────────────────────────────────────────────────────────────────────
 def run_statistical_tests(df: pd.DataFrame) -> dict:
     cats = [c for c in CATEGORY_ORDER if c in df["category"].unique()]
     groups = [df.loc[df["category"] == c, "depression_signal_score"].values for c in cats]
@@ -246,9 +182,8 @@ def run_statistical_tests(df: pd.DataFrame) -> dict:
     }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # PCA → t-SNE
-# ─────────────────────────────────────────────────────────────────────────────
 def reduce_pca_tsne(emb: np.ndarray, pca_dim: int = 50, seed: int = 42) -> np.ndarray:
     pca_dim = min(pca_dim, emb.shape[1], emb.shape[0])
     log.info("PCA → %d dims", pca_dim)
@@ -291,9 +226,8 @@ def plot_tsne(coords: np.ndarray, labels: pd.Series, out_path: Path,
     log.info("  → %s", out_path)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # GMM with AIC/BIC selection
-# ─────────────────────────────────────────────────────────────────────────────
 def fit_gmm_with_selection(reduced: np.ndarray,
                            k_range: range = range(2, 13),
                            seed: int = 42) -> tuple[GaussianMixture, pd.DataFrame]:
@@ -329,9 +263,8 @@ def plot_gmm_selection(selection: pd.DataFrame, chosen_k: int, out_path: Path) -
     log.info("  → %s", out_path)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # Cluster × category contingency
-# ─────────────────────────────────────────────────────────────────────────────
 def plot_cluster_category(df: pd.DataFrame, cluster_col: str, out_path: Path,
                           title: str) -> None:
     cats = [c for c in CATEGORY_ORDER if c in df["category"].unique()]
@@ -351,9 +284,8 @@ def plot_cluster_category(df: pd.DataFrame, cluster_col: str, out_path: Path,
     log.info("  → %s", out_path)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # Main
-# ─────────────────────────────────────────────────────────────────────────────
 def main(sample: int | None = None, do_embeddings: bool = True) -> None:
     sns.set_context("notebook")
     sns.set_style("whitegrid")
@@ -415,7 +347,7 @@ def main(sample: int | None = None, do_embeddings: bool = True) -> None:
         emb = emb[idx]
         log.info("Sampled %d comments for clustering / t-SNE", len(work_df))
 
-    # PCA → t-SNE (the README-specified pipeline)
+    # PCA to t-SNE
     coords = reduce_pca_tsne(emb)
     work_df["tsne_x"] = coords[:, 0]
     work_df["tsne_y"] = coords[:, 1]
@@ -427,7 +359,7 @@ def main(sample: int | None = None, do_embeddings: bool = True) -> None:
         palette=CATEGORY_PALETTE,
     )
 
-    # HDBSCAN labels — already produced in Step 2
+    # HDBSCAN labels    
     if "cluster_label" in work_df.columns:
         plot_tsne(
             coords, work_df["cluster_label"].astype(str),
@@ -451,7 +383,7 @@ def main(sample: int | None = None, do_embeddings: bool = True) -> None:
 
     gmm_labels = gmm.predict(pca_reduced)
     work_df["gmm_label"] = gmm_labels
-    # Also keep the highest soft-assignment probability for inspection
+    # Keep the highest soft-assignment probability for inspection
     work_df["gmm_max_prob"] = gmm.predict_proba(pca_reduced).max(axis=1)
 
     plot_tsne(
@@ -462,7 +394,7 @@ def main(sample: int | None = None, do_embeddings: bool = True) -> None:
     plot_cluster_category(
         work_df, "gmm_label",
         OUT_DIR / "gmm_category_heatmap.png",
-        title="GMM cluster × category (annot = raw count, colour = row share)",
+        title="GMM cluster and category (annot = raw count, colour = row share)",
     )
 
     # Per-comment output
@@ -474,8 +406,6 @@ def main(sample: int | None = None, do_embeddings: bool = True) -> None:
     keep = [c for c in keep if c in work_df.columns]
     work_df[keep].to_csv(OUT_DIR / "comment_with_clusters.csv", index=False)
     log.info("  → %s", OUT_DIR / "comment_with_clusters.csv")
-
-    log.info("Done. All Step 3 outputs in %s", OUT_DIR)
 
 
 if __name__ == "__main__":
