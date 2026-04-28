@@ -1,2 +1,16 @@
 .env
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Local virtualenvs / conda envs
+.venv/
+.conda/
+venv/
+
+# Step 2 derived artifacts (regenerable from src/comment_analysis.py)
+data/processed/
+data/outputs/
