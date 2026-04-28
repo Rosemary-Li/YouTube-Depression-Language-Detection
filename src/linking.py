@@ -2,6 +2,7 @@
 linking.py — Step 3: Cross-Category Comparison & Visualization
 ═══════════════════════════════════════════════════════════════════════════════
 
+
 Inputs
 ──────
   data/processed/comment_features.csv     (Step 2 output, ~10.8k rows)
