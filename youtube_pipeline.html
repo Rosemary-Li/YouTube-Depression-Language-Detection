@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Depression Signal Detection — Pipeline</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f4f0;
+    color: #1a1a18;
+    padding: 32px 16px 48px;
+  }
+  h1 { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #6b6b66; margin-bottom: 16px; }
+
+  .rq {
+    max-width: 820px; margin: 0 auto 14px;
+    background: #fff; border: 1px solid #e0dfd8;
+    border-left: 4px solid #7f77dd; border-radius: 8px;
+    padding: 14px 18px; font-size: 13px; color: #3c3489; line-height: 1.6;
+  }
+  .rq strong { font-style: normal; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #888; display: block; margin-bottom: 4px; }
+
+  .note {
+    max-width: 820px; margin: 0 auto 20px;
+    border: 1px solid #e0dfd8; border-radius: 8px;
+    padding: 13px 18px; font-size: 12px; color: #555; line-height: 1.6;
+    background: #fff;
+  }
+  .note strong { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #999; display: block; margin-bottom: 4px; }
+
+  .pipeline { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; }
+
+  .step { border-radius: 12px; padding: 18px 20px 20px; }
+  .step-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 3px; flex-wrap: wrap; }
+  .step-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.6; }
+  .step-title { font-size: 15px; font-weight: 600; }
+  .step-io { font-size: 11px; color: #888; margin-bottom: 8px; font-family: "SF Mono", monospace; }
+  .step-desc { font-size: 12px; margin-bottom: 12px; opacity: 0.68; line-height: 1.5; }
+
+  .badge { font-size: 10px; font-weight: 600; border-radius: 4px;
+    padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+  .badge-star { background: #ef9f27; color: #412402; }
+  .badge-opt  { background: #d85a30; color: #fff; }
+
+  .cards { display: flex; gap: 8px; flex-wrap: wrap; }
+  .card { flex: 1; min-width: 140px; border-radius: 8px; padding: 11px 13px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(0,0,0,0.07); }
+  .card-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .card-body  { font-size: 11.5px; line-height: 1.55; opacity: 0.72; }
+
+  .arrow { text-align: center; font-size: 18px; color: #bbb; padding: 5px 0; }
+
+  /* layers inside step 2 */
+  .layers { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
+  .layer { border-radius: 8px; padding: 10px 14px;
+    background: rgba(255,255,255,0.55); border: 1px solid rgba(0,0,0,0.07); }
+  .layer-head { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+  .layer-body { font-size: 11.5px; line-height: 1.55; opacity: 0.72; }
+
+  .tag { display: inline-block; font-size: 10px; font-weight: 600;
+    border-radius: 3px; padding: 1px 6px; margin-right: 5px; vertical-align: middle; }
+  .tag-l1 { background: #9fe1cb; color: #04342c; }
+  .tag-l2 { background: #5dcaa5; color: #04342c; }
+  .tag-l3 { background: #1d9e75; color: #fff; }
+
+  /* tool pills */
+  .tools { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .pill { font-size: 10.5px; font-weight: 500; border-radius: 20px;
+    padding: 2px 10px; background: rgba(0,0,0,0.06); color: #333; }
+
+  /* two-col grid for step 3 */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* result table */
+  .result-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+  .result-table th { text-align: left; font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1); color: #555; }
+  .result-table td { padding: 7px 10px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: #444; vertical-align: middle; }
+  .result-table tr:last-child td { border-bottom: none; }
+  .dot { display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+  /* step color themes */
+  .s0 { background: #ebebea; }
+  .s0 .step-label { color: #555; }
+  .s0 .step-title { color: #222; }
+
+  .s1 { background: #eeedfe; }
+  .s1 .step-label { color: #534ab7; }
+  .s1 .step-title { color: #3c3489; }
+  .s1 .card { border-color: rgba(83,74,183,0.12); }
+
+  .s2 { background: #e1f5ee; }
+  .s2 .step-label { color: #0f6e56; }
+  .s2 .step-title { color: #085041; }
+  .s2 .layer { border-color: rgba(15,110,86,0.12); }
+
+  .s3 { background: #faeeda; }
+  .s3 .step-label { color: #854f0b; }
+  .s3 .step-title { color: #633806; }
+  .s3 .card { border-color: rgba(133,79,11,0.12); }
+
+  .s4 { background: #faece7; }
+  .s4 .step-label { color: #993c1d; }
+  .s4 .step-title { color: #4a1b0c; }
+  .s4 .card { border-color: rgba(153,60,29,0.12); }
+
+  /* cv bar */
+  .cv-bar { display: flex; gap: 6px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+  .cv-fold { width: 44px; height: 22px; border-radius: 4px; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; }
+  .cv-fold.test  { background: #d85a30; }
+  .cv-fold.train { background: rgba(153,60,29,0.18); color: #993c1d; }
+  .cv-label { font-size: 11px; color: #888; margin-left: 4px; }
+
+  /* limitations */
+  .limits { max-width: 820px; margin: 0 auto;
+    border: 1.5px dashed #ccc; border-radius: 10px; padding: 14px 18px; }
+  .limits-title { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; }
+  .limits ul { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; }
+  .limits li { font-size: 11.5px; color: #666; background: #eee;
+    border-radius: 20px; padding: 3px 11px; }
+
+  footer { text-align: center; font-size: 11px; color: #bbb; margin-top: 20px; }
+
+  @media (max-width: 560px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .card  { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<h1>YouTube Depression Signal Detection</h1>
+<p class="subtitle">Pipeline — share with team</p>
+
+<div class="rq">
+  <strong>Research questions</strong>
+  1. Across different YouTube content categories, how does the natural prevalence of depression-indicative language vary?<br>
+  2. To what extent does video-level contextual framing shape the linguistic patterns of depression-related self-disclosure in comments?
+</div>
+
+<div class="note">
+  <strong>Core design principle</strong>
+  The analysis unit is the <strong>comment</strong>, not the video. We do not search for depression-related videos.
+  We sample high-traffic videos across five everyday categories, then scan every comment for depression-indicative language
+  using a three-layer NLP method. Depression relevance is determined entirely post-hoc at the comment level.
+</div>
+
+<div class="pipeline">
+
+  <!-- ── STEP 0 ── -->
+  <div class="step s0">
+    <div class="step-header">
+      <span class="step-label">Step 0</span>
+      <span class="step-title">Data Collection</span>
+    </div>
+    <p class="step-io">Output → data/raw/videos.json · data/raw/comments.json</p>
+    <p class="step-desc">YouTube Data API v3 — five predefined categories ranked by view count. No depression keywords used at collection time.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Five categories</div>
+        <div class="card-body">
+          Mental health · Fitness / wellness<br>
+          Music / entertainment<br>
+          News / current events · Personal vlog
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per category</div>
+        <div class="card-body">Top 40–50 videos by view count.<br>~200–250 videos total.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per video — metadata</div>
+        <div class="card-body">title · description · tags<br>view_count · like_count · comment_count</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Per video — comments</div>
+        <div class="card-body">Top 50 comments by likes, stored with video_id as foreign key.<br>~10,000–12,500 comments total.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="step s1">
+    <div class="step-header">
+      <span class="step-label">Step 1</span>
+      <span class="step-title">Video-Level Feature Extraction</span>
+    </div>
+    <p class="step-io">Input: videos.json → Output: data/processed/video_features.csv</p>
+    <p class="step-desc">
+      Categories are already fixed from Step 0 — no reclassification needed.
+      Extract lightweight NLP features from title and description to characterise each video's tone and framing.
+      These features are joined with comment scores in Step 3.
+    </p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Title sentiment</div>
+        <div class="card-body">VADER compound score ∈ [−1, 1]<br>Captures overall tone of the video title.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Description sentiment</div>
+        <div class="card-body">VADER compound score<br>TextBlob polarity — secondary signal</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Subjectivity</div>
+        <div class="card-body">TextBlob subjectivity ∈ [0, 1]<br>High = personal / opinionated framing</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Text statistics</div>
+        <div class="card-body">desc_word_count<br>desc_lexical_diversity<br>(unique tokens / total tokens)</div>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="pill">VADER</span>
+      <span class="pill">TextBlob</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="step s2">
+    <div class="step-header">
+      <span class="step-label">Step 2</span>
+      <span class="step-title">Comment-Level Depression Signal Detection</span>
+    </div>
+    <p class="step-io">Input: comments.json → Output: data/processed/comment_features.csv</p>
+    <p class="step-desc">
+      Three layers of increasing specificity. Negative sentiment alone is insufficient —
+      "this video is garbage" is negative but not depression-indicative.
+    </p>
+
+    <div class="layers">
+      <div class="layer">
+        <div class="layer-head">
+          <span class="tag tag-l1">Layer 1</span> Multi-tool sentiment scoring — broad signal
+        </div>
+        <div class="layer-body">
+          Three independent tools produce a more robust signal than a single model.
+          TextBlob <strong>subjectivity</strong> (0–1) is particularly useful: high subjectivity correlates with personal self-disclosure.<br><br>
+          VADER compound · TextBlob polarity · TextBlob subjectivity · AFINN integer sum
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-head">
+          <span class="tag tag-l2">Layer 2</span> TF-IDF weighted depression lexicon matching — domain-specific
+        </div>
+        <div class="layer-body">
+          Comments are matched against a LIWC-based mental health lexicon (negative emotion, sadness, anxiety, health)
+          and a depression-specific wordlist. Rather than binary presence/absence matching,
+          <strong>TF-IDF weighting</strong> with the vocabulary locked to the depression lexicon is applied —
+          capturing how prominently depression terms appear. Extends to <strong>bigrams</strong>
+          (e.g. "feel hopeless", "can't sleep") for richer coverage.
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-head">
+          <span class="tag tag-l3">Layer 3</span> Self-disclosure pattern detection — high precision
+        </div>
+        <div class="layer-body">
+          First-person pronoun + depression-indicative vocabulary combinations identified via
+          <strong>spaCy POS tagging</strong> (e.g. "I feel hopeless", "I've been struggling",
+          "I can't do this anymore"). Captures genuine personal disclosure rather than reactions
+          to video content. Strongest research signal.
+        </div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Additional text features</div>
+        <div class="card-body">
+          lexical_diversity = unique / total tokens<br>
+          word_count — filters comments &lt;5 words
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Embedding</div>
+        <div class="card-body">sentence-transformers/all-MiniLM-L6-v2<br>For clustering + visualization.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Output per comment</div>
+        <div class="card-body">
+          3× sentiment scores · subjectivity<br>
+          TF-IDF lexicon score · self-disclosure flag<br>
+          lexical_diversity · word_count<br>
+          composite depression signal score
+        </div>
+      </div>
+    </div>
+    <div class="tools">
+      <span class="pill">VADER</span>
+      <span class="pill">TextBlob</span>
+      <span class="pill">AFINN</span>
+      <span class="pill">LIWC</span>
+      <span class="pill">TF-IDF (bigrams)</span>
+      <span class="pill">spaCy POS</span>
+      <span class="pill">MiniLM-L6-v2</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="step s3">
+    <div class="step-header">
+      <span class="step-label">Step 3</span>
+      <span class="step-title">
+        Cross-Category Comparison &amp; Visualization
+        <span class="badge badge-star">★ core result</span>
+      </span>
+    </div>
+    <p class="step-io">Input: video_features.csv + comment_features.csv → Output: heatmap.png · tsne.png</p>
+    <p class="step-desc">
+      Join Step 1 video features with Step 2 comment scores via video_id.
+      Cluster comments, visualise in 2D, and compare depression signal prevalence across the five categories.
+    </p>
+
+    <div class="grid2" style="margin-bottom: 8px;">
+      <div class="card">
+        <div class="card-title">Clustering — HDBSCAN</div>
+        <div class="card-body">
+          Density-based. No fixed k required. Handles noise naturally.
+          Groups comments by linguistic pattern.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Clustering — GMM</div>
+        <div class="card-body">
+          Soft clustering: each comment receives a probability per cluster,
+          not a hard label. Optimal k selected by AIC / BIC.
+          Complements HDBSCAN for ambiguous comments.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Dimensionality reduction</div>
+        <div class="card-body">
+          <strong>PCA → t-SNE</strong> two-step pipeline.<br>
+          PCA: high-D → 50 components (noise removal).<br>
+          t-SNE: 50D → 2D (local structure preserved).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Statistical tests</div>
+        <div class="card-body">
+          ANOVA + KS-test across categories.<br>
+          Are differences in depression signal rate statistically significant?
+        </div>
+      </div>
+    </div>
+
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Depression signal rate</th>
+          <th>Avg sentiment</th>
+          <th>Self-disclosure rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:#7f77dd"></span>Mental health</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><span class="dot" style="background:#1d9e75"></span>Personal vlog</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><span class="dot" style="background:#ef9f27"></span>Fitness / wellness</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><span class="dot" style="background:#378add"></span>News / current events</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><span class="dot" style="background:#d85a30"></span>Music / entertainment</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tools" style="margin-top: 12px;">
+      <span class="pill">HDBSCAN</span>
+      <span class="pill">GMM (AIC/BIC)</span>
+      <span class="pill">PCA (50D)</span>
+      <span class="pill">t-SNE (2D)</span>
+      <span class="pill">ANOVA</span>
+      <span class="pill">KS-test</span>
+      <span class="pill">seaborn / matplotlib</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- ── STEP 4 ── -->
+  <div class="step s4">
+    <div class="step-header">
+      <span class="step-label">Step 4</span>
+      <span class="step-title">
+        Supervised Classification
+        <span class="badge badge-opt">optional</span>
+      </span>
+    </div>
+    <p class="step-io">Input: comment_features.csv → Output: data/outputs/model_results.json</p>
+    <p class="step-desc">
+      If labeled examples are available, train classifiers to predict whether a comment contains a depression signal.
+      Three models compared via a standardized TF-IDF Pipeline and 5-fold cross-validation.
+    </p>
+
+    <div class="cards" style="margin-bottom: 10px;">
+      <div class="card">
+        <div class="card-title">Logistic Regression</div>
+        <div class="card-body">Strong interpretable baseline. Coefficient analysis shows which features drive signal detection.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Naive Bayes</div>
+        <div class="card-body">Computationally efficient. Well-suited for sparse TF-IDF feature matrices.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">SVM (linear)</div>
+        <div class="card-body">Strong performance on high-dimensional text. Robust to class imbalance with class_weight='balanced'.</div>
+      </div>
+    </div>
+
+    <!-- 5-fold CV illustration -->
+    <div style="background: rgba(255,255,255,0.45); border-radius: 8px; padding: 11px 13px;">
+      <div class="card-title" style="margin-bottom: 6px;">5-Fold Cross-Validation — evaluated on F1-macro</div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div class="cv-bar">
+          <div class="cv-fold test">fold 1</div>
+          <div class="cv-fold train">2</div><div class="cv-fold train">3</div>
+          <div class="cv-fold train">4</div><div class="cv-fold train">5</div>
+          <span class="cv-label">test on fold 1</span>
+        </div>
+        <div class="cv-bar">
+          <div class="cv-fold train">1</div>
+          <div class="cv-fold test">fold 2</div>
+          <div class="cv-fold train">3</div><div class="cv-fold train">4</div><div class="cv-fold train">5</div>
+          <span class="cv-label">test on fold 2</span>
+        </div>
+        <div class="cv-bar">
+          <div class="cv-fold train">1</div><div class="cv-fold train">2</div>
+          <div class="cv-fold test">fold 3</div>
+          <div class="cv-fold train">4</div><div class="cv-fold train">5</div>
+          <span class="cv-label">test on fold 3</span>
+        </div>
+        <div class="cv-bar">
+          <div class="cv-fold train">1</div><div class="cv-fold train">2</div>
+          <div class="cv-fold train">3</div>
+          <div class="cv-fold test">fold 4</div>
+          <div class="cv-fold train">5</div>
+          <span class="cv-label">test on fold 4</span>
+        </div>
+        <div class="cv-bar">
+          <div class="cv-fold train">1</div><div class="cv-fold train">2</div>
+          <div class="cv-fold train">3</div><div class="cv-fold train">4</div>
+          <div class="cv-fold test">fold 5</div>
+          <span class="cv-label">test on fold 5 → report mean ± std F1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tools" style="margin-top: 10px;">
+      <span class="pill">TF-IDF (bigrams)</span>
+      <span class="pill">sklearn Pipeline</span>
+      <span class="pill">Logistic Regression</span>
+      <span class="pill">Naive Bayes</span>
+      <span class="pill">SVM</span>
+      <span class="pill">cross_val_score (k=5)</span>
+      <span class="pill">F1-macro</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="limits">
+    <div class="limits-title">Limitations to address in paper</div>
+    <ul>
+      <li>Comment ≠ commenter</li>
+      <li>Negative sentiment ≠ depression — addressed by three-layer method</li>
+      <li>Top-comment bias (sorted by likes)</li>
+      <li>Five categories defined by research team — not exhaustive</li>
+      <li>No clinical ground truth</li>
+      <li>Frame results as: "depression-indicative linguistic signals" — not diagnosis</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer style="margin-top: 24px;">
+  Tools: YouTube Data API v3 · VADER · TextBlob · AFINN · LIWC · TF-IDF · spaCy ·
+  MiniLM-L6-v2 · HDBSCAN · GMM · PCA · t-SNE · sklearn Pipeline · seaborn
+</footer>
+
+</body>
+</html>
