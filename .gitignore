@@ -11,6 +11,5 @@ __pycache__/
 .conda/
 venv/
 
-# Step 2 derived artifacts (regenerable from src/comment_analysis.py)
-data/processed/
+# Step 2 derived artifacts (data/processed/ is committed for sharing)
 data/outputs/
