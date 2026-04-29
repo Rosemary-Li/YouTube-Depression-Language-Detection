@@ -1,0 +1,93 @@
+{
+  "n_samples": 10867,
+  "positive_rate": 0.1366522499309837,
+  "label": "self_disclosure_flag",
+  "n_folds": 5,
+  "scoring": "f1_macro",
+  "models": [
+    {
+      "model": "LogisticRegression",
+      "f1_macro_mean": 0.8251100813833949,
+      "f1_macro_std": 0.003193958316251326,
+      "f1_macro_folds": [
+        0.8256251518044251,
+        0.8236502020988616,
+        0.8203066915024531,
+        0.8258608749822336,
+        0.8301074865290013
+      ],
+      "accuracy_mean": 0.9030091644930612,
+      "accuracy_std": 0.0028408116852486546,
+      "precision_pos": 0.6012212306247064,
+      "recall_pos": 0.8619528619528619,
+      "f1_pos": 0.7083563918096292,
+      "confusion_matrix": [
+        [
+          8533,
+          849
+        ],
+        [
+          205,
+          1280
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n           0      0.977     0.910     0.942      9382\n           1      0.601     0.862     0.708      1485\n\n    accuracy                          0.903     10867\n   macro avg      0.789     0.886     0.825     10867\nweighted avg      0.925     0.903     0.910     10867\n"
+    },
+    {
+      "model": "NaiveBayes",
+      "f1_macro_mean": 0.4929413112290909,
+      "f1_macro_std": 0.009179343843953467,
+      "f1_macro_folds": [
+        0.5000701093144431,
+        0.49048872165207624,
+        0.4935397786887295,
+        0.5035364624793476,
+        0.4770714840108579
+      ],
+      "accuracy_mean": 0.8672126046389346,
+      "accuracy_std": 0.0012268645721975342,
+      "precision_pos": 0.9565217391304348,
+      "recall_pos": 0.02962962962962963,
+      "f1_pos": 0.05747877204441541,
+      "confusion_matrix": [
+        [
+          9380,
+          2
+        ],
+        [
+          1441,
+          44
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n           0      0.867     1.000     0.929      9382\n           1      0.957     0.030     0.057      1485\n\n    accuracy                          0.867     10867\n   macro avg      0.912     0.515     0.493     10867\nweighted avg      0.879     0.867     0.810     10867\n"
+    },
+    {
+      "model": "LinearSVM",
+      "f1_macro_mean": 0.848362857388073,
+      "f1_macro_std": 0.005238403357331803,
+      "f1_macro_folds": [
+        0.8520469816482086,
+        0.8510493714113351,
+        0.8423147187442314,
+        0.8545175491230175,
+        0.841885666013573
+      ],
+      "accuracy_mean": 0.9248180924120606,
+      "accuracy_std": 0.0020348631950396264,
+      "precision_pos": 0.7002398081534772,
+      "recall_pos": 0.7865319865319865,
+      "f1_pos": 0.7408816999682841,
+      "confusion_matrix": [
+        [
+          8882,
+          500
+        ],
+        [
+          317,
+          1168
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n           0      0.966     0.947     0.956      9382\n           1      0.700     0.787     0.741      1485\n\n    accuracy                          0.925     10867\n   macro avg      0.833     0.867     0.848     10867\nweighted avg      0.929     0.925     0.927     10867\n"
+    }
+  ]
+}
