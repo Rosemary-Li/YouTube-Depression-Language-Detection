@@ -4,7 +4,8 @@
 ![VADER](https://img.shields.io/badge/NLP-VADER-orange)
 ![TextBlob](https://img.shields.io/badge/NLP-TextBlob-orange)
 ![AFINN](https://img.shields.io/badge/NLP-AFINN-orange)
-![LIWC](https://img.shields.io/badge/Lexicon-LIWC-purple)
+![spaCy](https://img.shields.io/badge/NLP-spaCy-09a3d5)
+![SBERT](https://img.shields.io/badge/Embedding-MiniLM--L6-blueviolet)
 ![GMM](https://img.shields.io/badge/Clustering-GMM-teal)
 ![HDBSCAN](https://img.shields.io/badge/Clustering-HDBSCAN-teal)
 ![tSNE](https://img.shields.io/badge/Visualization-PCA--tSNE-9cf)
@@ -16,7 +17,7 @@
 
 本项目从五个内容类别的主流高流量 YouTube 视频中采集评论，使用 NLP 技术检测在日常评论区中自然出现的抑郁相关语言信号。我们并不主动搜索抑郁内容，而是衡量这类信号在普通公开话语中出现的频率与形式。
 
-本项目**不**试图诊断抑郁症。我们检测的是_抑郁指示性语言信号_，将其作为在野外场景中自发、自我披露的抑郁相关表达的代理指标。
+本项目**不**试图诊断抑郁症。我们检测的是*抑郁指示性语言信号*，将其作为在野外场景中自发、自我披露的抑郁相关表达的代理指标。
 
 ---
 
@@ -44,8 +45,6 @@
 │   ├── processed/            # 清洗后的特征工程数据
 │   └── outputs/              # 模型输出、聚类标签、图表
 │
-├── notebooks/                # 探索性分析与可视化
-│
 ├── src/
 │   ├── collect.py            # Step 0：YouTube Data API 爬取
 │   ├── video_analysis.py     # Step 1：视频级 NLP 特征提取
@@ -61,13 +60,13 @@
 
 ## Pipeline 总览
 
-| 步骤 | 脚本 | 输入 | 输出 |
-| --- | --- | --- | --- |
-| 0 — 数据采集 | `collect.py` | API 密钥、类别列表 | `data/raw/videos.json`、`data/raw/comments.json` |
-| 1 — 视频分析 | `video_analysis.py` | `videos.json` | `data/processed/video_features.csv` |
-| 2 — 评论分析 | `comment_analysis.py` | `comments.json` | `data/processed/comment_features.csv` |
-| 3 — 跨类别关联 | `linking.py` | 两份特征 CSV | `data/outputs/heatmap.png`、`data/outputs/tsne.png` |
-| 4 — 建模 | `modeling.py` | 两份特征 CSV | `data/outputs/model_results.json` |
+| 步骤           | 脚本                  | 输入               | 输出                                                |
+| -------------- | --------------------- | ------------------ | --------------------------------------------------- |
+| 0 — 数据采集   | `collect.py`          | API 密钥、类别列表 | `data/raw/videos.json`、`data/raw/comments.json`    |
+| 1 — 视频分析   | `video_analysis.py`   | `videos.json`      | `data/processed/video_features.csv`                 |
+| 2 — 评论分析   | `comment_analysis.py` | `comments.json`    | `data/processed/comment_features.csv`               |
+| 3 — 跨类别关联 | `linking.py`          | 两份特征 CSV       | `data/outputs/heatmap.png`、`data/outputs/tsne.png` |
+| 4 — 建模       | `modeling.py`         | 两份特征 CSV       | `data/outputs/model_results.json`                   |
 
 ---
 
@@ -114,13 +113,13 @@ python src/modeling.py
 
 视频从五个预定义内容类别中采样，每个类别代表一种典型的日常 YouTube 内容类型。在每个类别内，按观看量排序并选取前 N 个视频。采集和排序视频时不使用任何抑郁相关关键词——抑郁相关性完全在 Step 2 的**评论层面**事后判定。
 
-| 类别 | 在研究中的角色 |
-| --- | --- |
-| 心理健康 | 基准——预期抑郁信号率较高 |
+| 类别        | 在研究中的角色                 |
+| ----------- | ------------------------------ |
+| 心理健康    | 基准——预期抑郁信号率较高       |
 | 健身 / 健康 | 与心理健康相邻；具有激励性框架 |
-| 音乐 / 娱乐 | 高流量主流内容；受众广泛 |
-| 新闻 / 时事 | 情绪带入感强但非个人化框架 |
-| 个人 Vlog | 第一人称叙事；自我披露潜力较高 |
+| 音乐 / 娱乐 | 高流量主流内容；受众广泛       |
+| 新闻 / 时事 | 情绪带入感强但非个人化框架     |
+| 个人 Vlog   | 第一人称叙事；自我披露潜力较高 |
 
 **每个视频采集：** 按点赞数排序的前 50 条评论，以 `video_id` 作为外键存储。目标：每类别约 40–50 个视频，共约 200–250 个视频，约 10,000–12,500 条评论。
 
@@ -132,14 +131,14 @@ python src/modeling.py
 
 **每个视频提取的特征：**
 
-| 特征 | 方法 | 用途 |
-| --- | --- | --- |
-| `title_sentiment` | VADER compound 分 | 视频标题的情感倾向 |
-| `desc_sentiment_vader` | VADER compound 分 | 视频描述的情感倾向 |
-| `desc_sentiment_textblob` | TextBlob 极性分 | 辅助情感信号 |
-| `desc_subjectivity` | TextBlob 主观性分 | 描述的个人化 / 主观化程度 |
-| `desc_word_count` | 词元计数 | 描述长度 |
-| `desc_lexical_diversity` | 唯一词元数 / 总词元数 | 描述的词汇丰富度 |
+| 特征                      | 方法                  | 用途                      |
+| ------------------------- | --------------------- | ------------------------- |
+| `title_sentiment`         | VADER compound 分     | 视频标题的情感倾向        |
+| `desc_sentiment_vader`    | VADER compound 分     | 视频描述的情感倾向        |
+| `desc_sentiment_textblob` | TextBlob 极性分       | 辅助情感信号              |
+| `desc_subjectivity`       | TextBlob 主观性分     | 描述的个人化 / 主观化程度 |
+| `desc_word_count`         | 词元计数              | 描述长度                  |
+| `desc_lexical_diversity`  | 唯一词元数 / 总词元数 | 描述的词汇丰富度          |
 
 输出：`data/processed/video_features.csv`，每行对应一个视频。
 
@@ -153,12 +152,12 @@ python src/modeling.py
 
 使用三种独立工具对每条评论进行情感评分，得到更稳健的情感信号，而非依赖单一模型：
 
-| 工具 | 分数范围 | 说明 |
-| --- | --- | --- |
-| VADER | compound ∈ [−1, 1] | 专为短社交媒体文本优化 |
-| TextBlob | polarity ∈ [−1, 1] | 基于词典，稳定的基准信号 |
+| 工具     | 分数范围              | 说明                           |
+| -------- | --------------------- | ------------------------------ |
+| VADER    | compound ∈ [−1, 1]    | 专为短社交媒体文本优化         |
+| TextBlob | polarity ∈ [−1, 1]    | 基于词典，稳定的基准信号       |
 | TextBlob | subjectivity ∈ [0, 1] | 高主观性与个人自我披露高度相关 |
-| AFINN | 整数加和 | 词级别的情感效价评分 |
+| AFINN    | 整数加和              | 词级别的情感效价评分           |
 
 **第二层 — TF-IDF 加权抑郁词典匹配**（领域专项）
 
@@ -170,10 +169,10 @@ python src/modeling.py
 
 **同步提取的辅助文本特征：**
 
-| 特征 | 计算公式 | 依据 |
-| --- | --- | --- |
-| `lexical_diversity` | 唯一词元数 / 总词元数 | 抑郁语言通常词汇更为单调重复 |
-| `word_count` | 词元计数 | 极短评论（<5 词）不太可能是真实的自我披露 |
+| 特征                | 计算公式              | 依据                                      |
+| ------------------- | --------------------- | ----------------------------------------- |
+| `lexical_diversity` | 唯一词元数 / 总词元数 | 抑郁语言通常词汇更为单调重复              |
+| `word_count`        | 词元计数              | 极短评论（<5 词）不太可能是真实的自我披露 |
 
 每条评论综合三层信号得到一个**抑郁信号复合分**，跨类别对比在此分数上进行。
 
@@ -205,15 +204,15 @@ python src/modeling.py
 
 ---
 
-## Step 4 — 监督分类（可选）
+## Step 4 — 监督分类
 
 若有标注样本，可训练监督分类器预测某条评论是否含有抑郁信号。使用标准化 Pipeline（TF-IDF 特征提取 + 分类器）和 5 折交叉验证，对比三个模型：
 
-| 模型 | 说明 |
-| --- | --- |
-| Logistic Regression | 文本分类的强基准模型 |
-| Naive Bayes | 计算高效；适合稀疏 TF-IDF 特征 |
-| SVM（线性核） | 在高维文本上表现稳健 |
+| 模型                | 说明                           |
+| ------------------- | ------------------------------ |
+| Logistic Regression | 文本分类的强基准模型           |
+| Naive Bayes         | 计算高效；适合稀疏 TF-IDF 特征 |
+| SVM（线性核）       | 在高维文本上表现稳健           |
 
 全程使用 5 折交叉验证，确保评估结果不依赖单次训练/测试划分。采用 F1-macro 指标，以应对抑郁信号与非信号评论间潜在的类别不平衡问题。
 
@@ -221,33 +220,100 @@ python src/modeling.py
 
 ## 模型与工具
 
-| 任务 | 模型 / 工具 |
-| --- | --- |
-| 情感分析（第一层） | VADER、TextBlob、AFINN |
-| 抑郁词典匹配（第二层） | LIWC + TF-IDF（二元词组，锁定词汇表） |
-| 自我披露检测（第三层） | spaCy 词性标注 + 第一人称代词模式 |
-| 评论嵌入 | `sentence-transformers/all-MiniLM-L6-v2` |
-| 聚类 | HDBSCAN + GMM（AIC/BIC 选簇数） |
-| 降维 | PCA（50D）→ t-SNE（2D） |
-| 监督分类 | Logistic Regression、Naive Bayes、SVM（sklearn Pipeline） |
-| 交叉验证 | 5 折，F1-macro，sklearn `cross_val_score` |
-| 可视化 | `seaborn`、`matplotlib` |
+| 任务                   | 模型 / 工具                                               |
+| ---------------------- | --------------------------------------------------------- |
+| 情感分析（第一层）     | VADER、TextBlob、AFINN                                    |
+| 抑郁词典匹配（第二层） | LIWC 类目对齐词表 + TF-IDF（二元词组，锁定词汇表）        |
+| 自我披露检测（第三层） | spaCy 词性标注 + 第一人称代词模式                         |
+| 评论嵌入               | `sentence-transformers/all-MiniLM-L6-v2`                  |
+| 聚类                   | HDBSCAN + GMM（AIC/BIC 选簇数）                           |
+| 降维                   | PCA（50D）→ t-SNE（2D）                                   |
+| 监督分类               | Logistic Regression、Naive Bayes、SVM（sklearn Pipeline） |
+| 交叉验证               | 5 折，F1-macro，sklearn `cross_val_score`                 |
+| 可视化                 | `seaborn`、`matplotlib`                                   |
 
 ---
 
-## 预期核心结果
+## 方法学说明
 
-主要输出为五个类别的抑郁信号出现率跨类别对比：
+**标准 / 基线方法。** 以下方法构成本流水线的成熟基线：VADER、TextBlob、AFINN、
+spaCy POS 标注、TF-IDF（sklearn `TfidfVectorizer`）、PCA、t-SNE、HDBSCAN、
+GaussianMixture (GMM)、LogisticRegression、MultinomialNB，以及基于
+`cross_val_score` 的交叉验证。
 
-| 类别 | 抑郁信号率 | 平均情感分 | 自我披露率 |
-| --- | --- | --- | --- |
-| 心理健康 | （待测量） | （待测量） | （待测量） |
-| 个人 Vlog | （待测量） | （待测量） | （待测量） |
-| 健身 / 健康 | （待测量） | （待测量） | （待测量） |
-| 新闻 / 时事 | （待测量） | （待测量） | （待测量） |
-| 音乐 / 娱乐 | （待测量） | （待测量） | （待测量） |
+**对基线的扩展。** 在标准工具集之外做了若干补充，每一项都是成熟实践、
+针对基线方法的某一具体局限：
 
-各类别差异通过 ANOVA / KS 检验进行显著性检验。
+- **加入 LinearSVM 作为第三个分类器**，与 LogReg / NB 一起做三模型对比。
+  SVM 是三者中表现最好的（F1-macro = 0.829，对比 LogReg 0.776 / NB 0.484），
+  纳入 SVM 使模型对比有真正的差异。
+- **用 `StratifiedKFold` 替代普通 `cross_val_score` 切分。** 正例占 6.9%，
+  普通 K 折可能某些折几乎不含正例、折间方差极大；分层保证每折类别比例一致。
+- **跨类别差异的统计显著性检验**（`scipy.stats.f_oneway`、`kruskal`、
+  `ks_2samp` + Bonferroni 修正）。ANOVA + Kruskal-Wallis + 配对 KS
+  是组间分布比较的标准组合。
+- **sentence-transformers (`all-MiniLM-L6-v2`) 用于评论嵌入。** PCA / t-SNE /
+  HDBSCAN / GMM 流水线需要高维向量输入；用 SBERT 生成 384 维句嵌入能保留语义
+  相似度，TF-IDF 向量则会丢失聚类步骤本来想捕捉的局部语义结构。
+- **spaCy 在 `pos_` 之外使用 `lemma_` 和 `dep_`。** 在 POS 标注之外，还使用
+  词形还原匹配（"struggling" 和 "struggled" 都能匹配到 `struggle`），并用依存关系
+  校验第一人称代词是否真的是主语（`nsubj` / `nsubjpass`），减少 Layer 3 的误报。
+
+---
+
+## 核心结果
+
+跨类别抑郁信号出现率对比（n = 10,867 条评论，来自 5 个类别下的 230 个高流量视频）：
+
+| 类别        |     n | 抑郁信号率 ¹ | 平均负向情感 ² | 自我披露率 ³ | 词典命中率 ⁴ |
+| ----------- | ----: | -----------: | -------------: | -----------: | -----------: |
+| 心理健康    | 2,499 |    **28.5%** |      **0.142** |    **21.1%** |    **44.9%** |
+| 健身 / 健康 | 2,399 |         6.2% |          0.082 |         4.7% |         9.9% |
+| 新闻 / 时事 | 2,450 |         5.1% |          0.141 |         1.2% |         8.1% |
+| 个人 Vlog   | 2,300 |         3.2% |          0.071 |         2.6% |         6.7% |
+| 音乐 / 娱乐 | 1,219 |         2.2% |          0.095 |         1.5% |         5.1% |
+
+¹ 评论的全局复合 L1+L2+L3 信号分位列前 10% 的占比。
+² VADER + TextBlob + AFINN 聚合的负向情感分均值，范围 [0, 1]，越高越负。
+³ 经 spaCy POS 标注识别为"第一人称代词 + 抑郁词典"共现的评论占比。
+⁴ 至少命中一个 TF-IDF 词典项（任意 LIWC 类目下的抑郁词）的评论占比。
+
+**统计显著性。** 复合信号分在五个类别间差异极其显著：单因素 ANOVA _F_ = 586.4，
+_p_ < 0.001；Kruskal-Wallis _H_ = 1491.8，_p_ < 0.001。10 对类别间的两样本 KS 检验
+经 Bonferroni 修正后全部在 α = 0.05 水平显著。
+
+### 视频层面的语境框架（RQ2）
+
+将每条评论关联到所属视频的元数据，可以对比评论所处的*语境* —— 视频负面框架是否会催生更多抑郁相关的自我披露？
+
+| 类别        |  标题情感 | 描述情感 | 描述主观性 | 描述长度 |
+| ----------- | --------: | -------: | ---------: | -------: |
+| 心理健康    |     −0.07 |     0.36 |       0.31 |      106 |
+| 个人 Vlog   |     +0.11 |     0.23 |       0.15 |       45 |
+| 健身 / 健康 |     +0.12 |     0.56 |       0.37 |      173 |
+| 新闻 / 时事 | **−0.32** |     0.06 |       0.40 |      131 |
+| 音乐 / 娱乐 |     +0.01 |     0.39 |       0.36 |      192 |
+
+标题／描述情感由 VADER compound 给出 ∈ [−1, +1]；主观性由 TextBlob 给出 ∈ [0, 1]；
+长度以 token 计。表中数值均为以评论数加权的均值（每个视频按其评论数加权）。
+
+### 解读
+
+**RQ1 —— 自然出现率在类别之间差异极大。** 心理健康在所有评论级指标上都自成一档：
+抑郁信号率、自我披露率、词典命中率（44.9%）都是其它类别的 4–9 倍。这与"心理健康
+视频的评论区相对其它主流内容承载了更多自发的自我披露"这一假设吻合。
+
+**RQ2 —— 视频框架并不驱动评论级自我披露。** 新闻类视频框架最负
+（标题情感 **−0.32**，5 类中最负），但自我披露率 _最低_（**1.2%**）。
+反之，心理健康标题情感只是轻度偏负（−0.07），自我披露率却高出 **17 倍**。
+这种解耦说明视频情感不是个人披露的良好预测变量：新闻的负向是内容驱动的
+（政治、冲突），并不是个人的，因此不会激发评论区的自我披露。
+**驱动评论者是否在主流评论区谈论自身心理状态的，是话题领域，而不是视频情感。**
+
+**监督学习分类。** 用原始评论文本 + TF-IDF（1–2 grams）+ 5 折交叉验证预测
+`self_disclosure_flag`：LinearSVM 取得 **F1-macro = 0.829 ± 0.014**（三个模型中最优）。
+Top 正向特征（`lost`、`crying`、`depression`、`anxiety`、`me`、`tears`、`cried`、`my`）
+正是 Layer 3 设计要捕捉的抑郁词汇 + 第一人称组合，从另一个角度验证了标注流水线的合理性。
 
 ---
 
@@ -259,7 +325,7 @@ python src/modeling.py
 - **类别采样局限**：五个类别由研究团队定义，并不能穷举所有 YouTube 内容类型。
 - **无临床基准真值**：所有标签均基于语言和行为信号的代理指标，而非临床评估。
 
-结论应解读为衡量_公开评论区中抑郁指示性语言模式的自然出现率_，而非临床或诊断性声明。
+结论应解读为衡量*公开评论区中抑郁指示性语言模式的自然出现率*，而非临床或诊断性声明。
 
 ---
 

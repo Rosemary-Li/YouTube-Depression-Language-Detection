@@ -13,3 +13,5 @@ venv/
 
 # Step 2 derived artifacts (data/processed/ is committed for sharing)
 data/outputs/
+.DS_Store
+.vscode/

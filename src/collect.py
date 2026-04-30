@@ -1,41 +1,3 @@
-"""
-collect.py — Step 0: YouTube Data API crawler
-═══════════════════════════════════════════════════════════════════════════════
-
-Collects videos and comments across 5 content categories without using any
-depression-related keywords to filter or rank content. Depression relevance
-is determined entirely post-hoc in Steps 1–2.
-
-Category sampling strategy
-──────────────────────────
-  mental_health        search-based  ("mental health vlog", "therapy journey" …)
-  fitness_wellness     search-based  ("workout routine", "wellness journey" …)
-  music_entertainment  chart-based   (YouTube category 10 — Music, global chart)
-  news_current_events  chart-based   (YouTube category 25 — News & Politics)
-  personal_vlog        search-based  ("day in my life vlog", "life update" …)
-
-Within each category, videos are ranked by view count; the top TARGET_PER_CATEGORY
-are selected. Per-video comment collection: top COMMENTS_PER_VIDEO comments
-sorted by relevance (approximates like-count ranking).
-
-Outputs
-───────
-  data/raw/videos.json    — list of video objects with metadata
-  data/raw/comments.json  — list of comment objects with video_id foreign key
-
-Quota budget  (YouTube Data API v3 limit: 10,000 units / day)
-─────────────
-  search.list   = 100 units/call  ×  ~15 calls   =  ~1,500 units (Phase 1 search)
-  videos.list   =   1 unit/call   ×  ~10 calls   =    ~10 units  (Phase 1 chart)
-  videos.list   =   1 unit/call   ×  ~10 calls   =    ~10 units  (Phase 2 stats)
-  commentThreads=   1 unit/call   × ~250 calls   =   ~250 units  (Phase 3)
-  ─────────────────────────────────────────────────────────────────
-  Total                                           ≈  1,770 units  (18 % of daily cap)
-
-Rate limit: CALL_INTERVAL seconds between every API call.
-Progress is check-pointed after every call; safe to interrupt and resume.
-"""
-
 import json
 import os
 import time
@@ -48,13 +10,11 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ── Load API key from .env ────────────────────────────────────────────────────
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 if not API_KEY:
     raise RuntimeError("YOUTUBE_API_KEY not set. Add it to .env in the project root.")
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT            = Path(__file__).resolve().parents[1]
 RAW_DIR         = ROOT / "data" / "raw"
 VIDEOS_FILE     = RAW_DIR / "videos.json"
@@ -63,16 +23,12 @@ CHECKPOINT_FILE = RAW_DIR / "checkpoint.json"
 LOG_FILE        = RAW_DIR / "collect.log"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── Collection parameters ─────────────────────────────────────────────────────
-TARGET_PER_CATEGORY = 50    # videos per category
-COMMENTS_PER_VIDEO  = 50    # top-N comments per video (one API call, no pagination)
-CALL_INTERVAL       = 3     # seconds between API calls
+TARGET_PER_CATEGORY = 50   
+COMMENTS_PER_VIDEO  = 50    
+CALL_INTERVAL       = 3     
 DAILY_QUOTA         = 10_000
-QUOTA_BUFFER        = 300   # stop this many units before the hard cap
+QUOTA_BUFFER        = 300   
 
-# ── Category definitions ──────────────────────────────────────────────────────
-# search-based: use broad topical queries; order=viewCount picks most-viewed first
-# chart-based:  YouTube mostPopular chart filtered by official category ID
 CATEGORIES = {
     "mental_health": {
         "method": "search",
@@ -98,12 +54,12 @@ CATEGORIES = {
     },
     "music_entertainment": {
         "method": "chart",
-        "category_id": "10",   # Music
+        "category_id": "10",  
         "label": "Music / Entertainment",
     },
     "news_current_events": {
         "method": "chart",
-        "category_id": "25",   # News & Politics
+        "category_id": "25",   
         "label": "News / Current Events",
     },
     "personal_vlog": {
@@ -119,7 +75,6 @@ CATEGORIES = {
     },
 }
 
-# ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)s  %(message)s",
@@ -130,7 +85,6 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ── Quota / rate-limit helpers ────────────────────────────────────────────────
 PACIFIC = pytz.timezone("America/Los_Angeles")
 
 def today_pt() -> str:
@@ -168,16 +122,12 @@ def rate_wait(cp: dict, cost: int, client_ref: list, label: str):
     log.info("%s | quota used: %d", label, cp["quota_used_today"])
     time.sleep(CALL_INTERVAL)
 
-# ── Checkpoint helpers ────────────────────────────────────────────────────────
 def empty_checkpoint() -> dict:
     return {
-        # Phase 1 state: {cat_key: {"ids": [...], "done": bool, "query_idx": int, "page_token": str|None}}
         "p1": {cat: {"ids": [], "done": False, "query_idx": 0, "page_token": None}
                for cat in CATEGORIES},
-        # Phase 2 state: {video_id: video_dict}
         "p2_videos": {},
         "p2_done": False,
-        # Phase 3 state
         "p3_done_ids": [],
         "quota_used_today": 0,
         "quota_date": "",
@@ -195,13 +145,10 @@ def save_checkpoint(cp: dict):
         json.dump(cp, f, ensure_ascii=False)
     os.replace(tmp, str(CHECKPOINT_FILE))
 
-# ── API client ────────────────────────────────────────────────────────────────
 def build_client():
     return build("youtube", "v3", developerKey=API_KEY, cache_discovery=False)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Phase 1 — Collect video IDs per category
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Phase 1 Collect video IDs per category
 def phase1_collect_ids(cp: dict):
     client_ref = [build_client()]
 
@@ -217,7 +164,6 @@ def phase1_collect_ids(cp: dict):
         log.info("Phase 1 | %-25s target=%d, have=%d", cat_cfg["label"], target, len(ids))
 
         if cat_cfg["method"] == "chart":
-            # ── chart-based: one page per call, paginate until target ──
             page_token = state["page_token"]
             while len(ids) < target:
                 rate_wait(cp, 1, client_ref,
@@ -250,7 +196,6 @@ def phase1_collect_ids(cp: dict):
                     break
 
         else:
-            # ── search-based: iterate queries; order=viewCount ──
             queries = cat_cfg["queries"]
             qi      = state["query_idx"]
             page_token = state["page_token"]
@@ -287,7 +232,6 @@ def phase1_collect_ids(cp: dict):
                 log.info("  query='%s' got %d (total %d)", query, len(new), len(ids))
 
                 page_token = resp.get("nextPageToken")
-                # move to next query if this one is exhausted or we have enough
                 if not page_token or len(ids) >= target:
                     qi += 1
                     page_token = None
@@ -295,7 +239,6 @@ def phase1_collect_ids(cp: dict):
                 state["query_idx"]  = qi
                 state["page_token"] = page_token
 
-        # cap at target
         state["ids"]  = list(ids)[:target]
         state["done"] = True
         save_checkpoint(cp)
@@ -303,13 +246,10 @@ def phase1_collect_ids(cp: dict):
 
     log.info("Phase 1 complete.")
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Phase 2 — Fetch video metadata + statistics; write videos.json
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Phase 2 Fetch video metadata + statistics; write videos.json
 def phase2_fetch_metadata(cp: dict):
     client_ref = [build_client()]
 
-    # Build list of (video_id, category_key) pairs not yet fetched
     already = set(cp["p2_videos"].keys())
     todo: list[tuple[str, str]] = []
     for cat_key, state in cp["p1"].items():
@@ -363,7 +303,6 @@ def phase2_fetch_metadata(cp: dict):
 
         save_checkpoint(cp)
 
-    # Write videos.json sorted by category then view_count
     all_videos = sorted(
         cp["p2_videos"].values(),
         key=lambda v: (v["category"], -v["view_count"]),
@@ -374,16 +313,13 @@ def phase2_fetch_metadata(cp: dict):
     cp["p2_done"] = True
     save_checkpoint(cp)
 
-    # Summary
     from collections import Counter
     dist = Counter(v["category_label"] for v in all_videos)
     log.info("Phase 2 complete. %d videos written to %s", len(all_videos), VIDEOS_FILE)
     for cat, cnt in dist.most_common():
         log.info("  %-30s %d videos", cat, cnt)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Phase 3 — Collect top-50 comments per video; write comments.json
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Phase 3 Collect top-50 comments per video; write comments.json
 def phase3_collect_comments(cp: dict):
     client_ref = [build_client()]
 
@@ -393,7 +329,6 @@ def phase3_collect_comments(cp: dict):
     log.info("Phase 3 | collecting top-%d comments for %d videos (%d already done)",
              COMMENTS_PER_VIDEO, len(videos), len(done_ids))
 
-    # Load existing comments so we can append
     existing: list[dict] = []
     if COMMENTS_FILE.exists():
         with open(COMMENTS_FILE, encoding="utf-8") as f:
@@ -412,7 +347,7 @@ def phase3_collect_comments(cp: dict):
                 part="snippet",
                 videoId=vid_id,
                 maxResults=COMMENTS_PER_VIDEO,
-                order="relevance",   # most-liked comments first
+                order="relevance",  
             ).execute()
         except HttpError as e:
             if e.resp.status == 403:
@@ -442,14 +377,12 @@ def phase3_collect_comments(cp: dict):
                 continue
             top = item["snippet"]["topLevelComment"]["snippet"]
             buf.append({
-                # Comment fields
                 "comment_id":   cid,
                 "text":         top.get("textDisplay", ""),
                 "author":       top.get("authorDisplayName", ""),
                 "like_count":   top.get("likeCount", 0),
                 "published_at": top.get("publishedAt", ""),
                 "collected_at": datetime.now(timezone.utc).isoformat(),
-                # Video context (foreign key + denormalised for convenience)
                 "video_id":          vid_id,
                 "category":          video["category"],
                 "category_label":    video["category_label"],
@@ -464,7 +397,6 @@ def phase3_collect_comments(cp: dict):
         cp["p3_done_ids"].append(vid_id)
         save_checkpoint(cp)
 
-    # Merge and write
     all_comments = existing + buf
     with open(COMMENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(all_comments, f, ensure_ascii=False, indent=2)
@@ -475,9 +407,7 @@ def phase3_collect_comments(cp: dict):
     for cat, cnt in dist.most_common():
         log.info("  %-30s %d comments", cat, cnt)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Entry point
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 def main():
     log.info("=" * 65)
     log.info("YouTube Depression Signal — collect.py")

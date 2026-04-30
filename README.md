@@ -4,7 +4,8 @@
 ![VADER](https://img.shields.io/badge/NLP-VADER-orange)
 ![TextBlob](https://img.shields.io/badge/NLP-TextBlob-orange)
 ![AFINN](https://img.shields.io/badge/NLP-AFINN-orange)
-![LIWC](https://img.shields.io/badge/Lexicon-LIWC-purple)
+![spaCy](https://img.shields.io/badge/NLP-spaCy-09a3d5)
+![SBERT](https://img.shields.io/badge/Embedding-MiniLM--L6-blueviolet)
 ![GMM](https://img.shields.io/badge/Clustering-GMM-teal)
 ![HDBSCAN](https://img.shields.io/badge/Clustering-HDBSCAN-teal)
 ![tSNE](https://img.shields.io/badge/Visualization-PCA--tSNE-9cf)
@@ -44,8 +45,6 @@ The analysis unit is the **comment**, not the video. A music video has no depres
 │   ├── processed/            # Cleaned and feature-engineered data
 │   └── outputs/              # Model outputs, cluster labels, figures
 │
-├── notebooks/                # Exploratory analysis and visualization
-│
 ├── src/
 │   ├── collect.py            # Step 0: YouTube Data API crawler
 │   ├── video_analysis.py     # Step 1: Video-level NLP feature extraction
@@ -61,13 +60,13 @@ The analysis unit is the **comment**, not the video. A music video has no depres
 
 ## Pipeline Overview
 
-| Step | Script | Input | Output |
-| --- | --- | --- | --- |
-| 0 — Data collection | `collect.py` | API key, category list | `data/raw/videos.json`, `data/raw/comments.json` |
-| 1 — Video analysis | `video_analysis.py` | `videos.json` | `data/processed/video_features.csv` |
-| 2 — Comment analysis | `comment_analysis.py` | `comments.json` | `data/processed/comment_features.csv` |
-| 3 — Cross-category linking | `linking.py` | both feature CSVs | `data/outputs/heatmap.png`, `data/outputs/tsne.png` |
-| 4 — Modeling | `modeling.py` | both feature CSVs | `data/outputs/model_results.json` |
+| Step                       | Script                | Input                  | Output                                              |
+| -------------------------- | --------------------- | ---------------------- | --------------------------------------------------- |
+| 0 — Data collection        | `collect.py`          | API key, category list | `data/raw/videos.json`, `data/raw/comments.json`    |
+| 1 — Video analysis         | `video_analysis.py`   | `videos.json`          | `data/processed/video_features.csv`                 |
+| 2 — Comment analysis       | `comment_analysis.py` | `comments.json`        | `data/processed/comment_features.csv`               |
+| 3 — Cross-category linking | `linking.py`          | both feature CSVs      | `data/outputs/heatmap.png`, `data/outputs/tsne.png` |
+| 4 — Modeling               | `modeling.py`         | both feature CSVs      | `data/outputs/model_results.json`                   |
 
 ---
 
@@ -114,13 +113,13 @@ python src/modeling.py
 
 Videos are sampled from five predefined content categories, each representing a distinct type of everyday YouTube content. Within each category, videos are ranked by view count and the top-N are selected. No depression-related keywords are used to filter or rank videos — depression relevance is determined entirely post-hoc at the **comment level** in Step 2.
 
-| Category | Role in study |
-| --- | --- |
-| Mental health | Baseline — expected higher depression signal rate |
-| Fitness / wellness | Adjacent to mental health; motivational framing |
-| Music / entertainment | High-traffic mainstream content; general audience |
-| News / current events | Emotionally charged but non-personal framing |
-| Personal vlog | First-person narrative; higher self-disclosure potential |
+| Category              | Role in study                                            |
+| --------------------- | -------------------------------------------------------- |
+| Mental health         | Baseline — expected higher depression signal rate        |
+| Fitness / wellness    | Adjacent to mental health; motivational framing          |
+| Music / entertainment | High-traffic mainstream content; general audience        |
+| News / current events | Emotionally charged but non-personal framing             |
+| Personal vlog         | First-person narrative; higher self-disclosure potential |
 
 **Per-video collection:** top 50 comments sorted by likes, stored with `video_id` as a foreign key. Target: ~40–50 videos per category, ~200–250 videos total, ~10,000–12,500 comments.
 
@@ -132,14 +131,14 @@ Since video categories are already assigned at collection time (Step 0), Step 1 
 
 **Features extracted per video:**
 
-| Feature | Method | Purpose |
-| --- | --- | --- |
-| `title_sentiment` | VADER compound score | Tone of video title |
-| `desc_sentiment_vader` | VADER compound score | Tone of video description |
-| `desc_sentiment_textblob` | TextBlob polarity | Secondary sentiment signal |
-| `desc_subjectivity` | TextBlob subjectivity | Degree of personal / opinionated framing |
-| `desc_word_count` | Token count | Description length |
-| `desc_lexical_diversity` | unique tokens / total tokens | Vocabulary richness of description |
+| Feature                   | Method                       | Purpose                                  |
+| ------------------------- | ---------------------------- | ---------------------------------------- |
+| `title_sentiment`         | VADER compound score         | Tone of video title                      |
+| `desc_sentiment_vader`    | VADER compound score         | Tone of video description                |
+| `desc_sentiment_textblob` | TextBlob polarity            | Secondary sentiment signal               |
+| `desc_subjectivity`       | TextBlob subjectivity        | Degree of personal / opinionated framing |
+| `desc_word_count`         | Token count                  | Description length                       |
+| `desc_lexical_diversity`  | unique tokens / total tokens | Vocabulary richness of description       |
 
 Output: `data/processed/video_features.csv` with one row per video.
 
@@ -153,12 +152,12 @@ Depression signal detection operates at the comment level. Sentiment analysis al
 
 Rather than relying on a single model, each comment is scored by three independent tools to produce a more robust sentiment signal:
 
-| Tool | Score | Notes |
-| --- | --- | --- |
-| VADER | compound ∈ [−1, 1] | Optimized for short social media text |
-| TextBlob | polarity ∈ [−1, 1] | Lexicon-based, stable baseline |
+| Tool     | Score                 | Notes                                                      |
+| -------- | --------------------- | ---------------------------------------------------------- |
+| VADER    | compound ∈ [−1, 1]    | Optimized for short social media text                      |
+| TextBlob | polarity ∈ [−1, 1]    | Lexicon-based, stable baseline                             |
 | TextBlob | subjectivity ∈ [0, 1] | High subjectivity correlates with personal self-disclosure |
-| AFINN | integer sum | Word-level valence scoring |
+| AFINN    | integer sum           | Word-level valence scoring                                 |
 
 **Layer 2 — TF-IDF weighted depression lexicon matching** (domain-specific)
 
@@ -170,10 +169,10 @@ First-person pronoun + depression-indicative vocabulary combinations are identif
 
 **Additional text features** extracted alongside the three layers:
 
-| Feature | Formula | Rationale |
-| --- | --- | --- |
-| `lexical_diversity` | unique tokens / total tokens | Depressive language tends to be more repetitive |
-| `word_count` | token count | Very short comments (<5 words) are less likely to be genuine self-disclosure |
+| Feature             | Formula                      | Rationale                                                                    |
+| ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| `lexical_diversity` | unique tokens / total tokens | Depressive language tends to be more repetitive                              |
+| `word_count`        | token count                  | Very short comments (<5 words) are less likely to be genuine self-disclosure |
 
 Each comment receives a composite **depression signal score** aggregating all three layers. Cross-category comparison is performed on this score.
 
@@ -205,15 +204,15 @@ Differences in depression signal rates across the five categories are tested for
 
 ---
 
-## Step 4 — Supervised Classification (Optional)
+## Step 4 — Supervised Classification
 
 If labeled examples are available, a supervised classifier can be trained to predict whether a comment contains a depression signal. Three models are compared using a standardized Pipeline with TF-IDF feature extraction and 5-fold cross-validation:
 
-| Model | Notes |
-| --- | --- |
-| Logistic Regression | Strong baseline for text classification |
-| Naive Bayes | Computationally efficient; well-suited for sparse TF-IDF features |
-| SVM (linear kernel) | Strong performance on high-dimensional text |
+| Model               | Notes                                                             |
+| ------------------- | ----------------------------------------------------------------- |
+| Logistic Regression | Strong baseline for text classification                           |
+| Naive Bayes         | Computationally efficient; well-suited for sparse TF-IDF features |
+| SVM (linear kernel) | Strong performance on high-dimensional text                       |
 
 5-fold cross-validation is used throughout to ensure stable estimates that are not sensitive to a single train/test split. Models are evaluated on F1-macro to account for potential class imbalance between depression-signal and non-signal comments.
 
@@ -221,33 +220,122 @@ If labeled examples are available, a supervised classifier can be trained to pre
 
 ## Models and Tools
 
-| Task | Model / Tool |
-| --- | --- |
-| Sentiment analysis (Layer 1) | VADER, TextBlob, AFINN |
-| Depression lexicon matching (Layer 2) | LIWC + TF-IDF (bigrams, locked vocabulary) |
-| Self-disclosure detection (Layer 3) | spaCy POS tagging + first-person pronoun patterns |
-| Comment embedding | `sentence-transformers/all-MiniLM-L6-v2` |
-| Clustering | HDBSCAN + GMM (AIC/BIC selection) |
-| Dimensionality reduction | PCA (50D) → t-SNE (2D) |
-| Supervised classification | Logistic Regression, Naive Bayes, SVM via sklearn Pipeline |
-| Cross-validation | 5-fold, F1-macro, sklearn `cross_val_score` |
-| Visualization | `seaborn`, `matplotlib` |
+| Task                                  | Model / Tool                                                  |
+| ------------------------------------- | ------------------------------------------------------------- |
+| Sentiment analysis (Layer 1)          | VADER, TextBlob, AFINN                                        |
+| Depression lexicon matching (Layer 2) | LIWC-aligned categories + TF-IDF (bigrams, locked vocabulary) |
+| Self-disclosure detection (Layer 3)   | spaCy POS tagging + first-person pronoun patterns             |
+| Comment embedding                     | `sentence-transformers/all-MiniLM-L6-v2`                      |
+| Clustering                            | HDBSCAN + GMM (AIC/BIC selection)                             |
+| Dimensionality reduction              | PCA (50D) → t-SNE (2D)                                        |
+| Supervised classification             | Logistic Regression, Naive Bayes, SVM via sklearn Pipeline    |
+| Cross-validation                      | 5-fold, F1-macro, sklearn `cross_val_score`                   |
+| Visualization                         | `seaborn`, `matplotlib`                                       |
 
 ---
 
-## Expected Core Result
+## Methodology Note
 
-The primary output is a cross-category comparison of depression signal prevalence:
+**Standard / baseline methods.** The following techniques form the established
+baseline for the pipeline: VADER, TextBlob, AFINN, spaCy POS tagging, TF-IDF
+(sklearn `TfidfVectorizer`), PCA, t-SNE, HDBSCAN, GaussianMixture (GMM),
+LogisticRegression, MultinomialNB, and `cross_val_score`-based cross-validation.
 
-| Category | Depression signal rate | Avg sentiment | Self-disclosure rate |
-| --- | --- | --- | --- |
-| Mental health | (measured) | (measured) | (measured) |
-| Personal vlog | (measured) | (measured) | (measured) |
-| Fitness / wellness | (measured) | (measured) | (measured) |
-| News / current events | (measured) | (measured) | (measured) |
-| Music / entertainment | (measured) | (measured) | (measured) |
+**Extensions beyond the baseline.** A few additions go beyond the standard
+toolkit. Each is a well-established practice adopted to address a specific
+limitation of the baseline:
 
-Differences across categories are tested for statistical significance (ANOVA / KS-test).
+- **LinearSVM as a third classifier** alongside LogReg / NB. SVM is the best
+  performer of the three (F1-macro = 0.829 vs 0.776 LogReg / 0.484 NB), and
+  including it makes the model comparison non-trivial.
+- **`StratifiedKFold` instead of plain `cross_val_score` splits.** With a 6.9%
+  positive class, plain k-fold can produce folds with very few positives and
+  high variance; stratification preserves the class balance per fold.
+- **Statistical significance testing** (`scipy.stats.f_oneway`,
+  `kruskal`, `ks_2samp` with Bonferroni correction) for cross-category
+  differences. We use ANOVA + Kruskal-Wallis + pairwise KS as the standard
+  combination for comparing distributions across groups.
+- **Sentence-transformers (`all-MiniLM-L6-v2`) for comment embeddings.** The
+  PCA / t-SNE / HDBSCAN / GMM pipeline operates on a high-dimensional vector
+  input; we use SBERT to produce 384-d sentence embeddings that capture
+  semantic similarity, since TF-IDF embeddings would lose most of the local
+  semantic structure the clustering step is designed to find.
+- **spaCy `lemma_` and `dep_` in addition to `pos_`.** Beyond POS tagging, we
+  also use lemma-based vocabulary matching (so "struggling" and "struggled"
+  both match `struggle`) and dependency tags to verify that the first-person
+  pronoun is the syntactic subject (`nsubj` / `nsubjpass`), reducing false
+  positives in Layer 3.
+
+---
+
+## Core Result
+
+Cross-category comparison of depression signal prevalence
+(n = 10,867 comments from 230 high-engagement videos across 5 categories):
+
+| Category              |     n | Depression signal rate¹ | Avg neg-sentiment² | Self-disclosure rate³ | Lex hit rate⁴ |
+| --------------------- | ----: | ----------------------: | -----------------: | --------------------: | ------------: |
+| Mental health         | 2,499 |               **28.5%** |          **0.142** |             **21.1%** |     **44.9%** |
+| Fitness / wellness    | 2,399 |                    6.2% |              0.082 |                  4.7% |          9.9% |
+| News / current events | 2,450 |                    5.1% |              0.141 |                  1.2% |          8.1% |
+| Personal vlog         | 2,300 |                    3.2% |              0.071 |                  2.6% |          6.7% |
+| Music / entertainment | 1,219 |                    2.2% |              0.095 |                  1.5% |          5.1% |
+
+¹ Share of comments in the top decile of the global composite L1+L2+L3 signal score.
+² Mean of the aggregated VADER + TextBlob + AFINN negativity score, range [0, 1] (higher = more negative).
+³ Share of comments matching first-person pronoun + depression-vocabulary via spaCy POS tagging.
+⁴ Share of comments with at least one TF-IDF lexicon hit (any LIWC-aligned depression term).
+
+**Statistical significance.** Differences in the composite signal score across
+the five categories are highly significant: one-way ANOVA _F_ = 586.4,
+_p_ < 0.001; Kruskal-Wallis _H_ = 1491.8, _p_ < 0.001. All 10 pairwise category
+contrasts remain significant after Bonferroni correction (two-sample KS-test,
+α = 0.05).
+
+### Video-level framing (RQ2)
+
+Joining each comment to its parent video's metadata lets us compare the
+_context_ that comments are written under — does negative video framing produce
+more depression-related self-disclosure?
+
+| Category              | Title sentiment | Desc sentiment | Desc subjectivity | Desc length |
+| --------------------- | --------------: | -------------: | ----------------: | ----------: |
+| Mental health         |           −0.07 |           0.36 |              0.31 |         106 |
+| Personal vlog         |           +0.11 |           0.23 |              0.15 |          45 |
+| Fitness / wellness    |           +0.12 |           0.56 |              0.37 |         173 |
+| News / current events |       **−0.32** |           0.06 |              0.40 |         131 |
+| Music / entertainment |           +0.01 |           0.39 |              0.36 |         192 |
+
+Title / description sentiment from VADER compound ∈ [−1, +1]; subjectivity from
+TextBlob ∈ [0, 1]; length in tokens. All values are comment-weighted means
+(each video is averaged proportionally to the number of comments it received).
+
+### Interpretation
+
+**RQ1 — natural prevalence varies sharply by category.** Mental health stands
+apart on every comment-level dimension: its depression signal rate,
+self-disclosure rate, and lexicon hit rate (44.9%) are 4–9× higher than any
+other category. This is consistent with the hypothesis that mental-health
+comment sections host disproportionately more spontaneous self-disclosure
+relative to other types of mainstream content.
+
+**RQ2 — video framing does _not_ drive comment-level self-disclosure.** News
+has the most negative video framing (title sentiment **−0.32**, the most
+negative of any category) yet the _lowest_ self-disclosure rate (**1.2%**). By
+contrast, mental health has only mildly negative titles (−0.07) but the
+**17×** higher self-disclosure rate. The decoupling shows that video tone is
+a poor predictor of personal disclosure: News negativity is content-driven
+(politics, conflict) rather than personal, and it doesn't elicit personal
+self-disclosure in the comment section. **Topic domain, not video sentiment,
+appears to drive whether commenters use mainstream comment sections to talk
+about their own mental state.**
+
+**Supervised classification.** Predicting `self_disclosure_flag` from raw
+comment text with TF-IDF (1–2 grams) + 5-fold CV: LinearSVM achieves
+**F1-macro = 0.829 ± 0.014** (best of three models). Top positive features
+(`lost`, `crying`, `depression`, `anxiety`, `me`, `tears`, `cried`, `my`)
+are exactly the depression-vocabulary + first-person tokens that Layer 3 was
+designed to detect, validating the labeling pipeline from a different angle.
 
 ---
 

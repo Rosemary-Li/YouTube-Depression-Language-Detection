@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DepSignal · Depression Language in YouTube Comments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=Fraunces:opsz,ital,wght@9..144,0,300..700;9..144,1,300..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #FF0000;
+    --red-deep: #CC0000;
+    --red-soft: #FFEBEB;
+    --bg: #FFFFFF;
+    --bg-2: #FAFAFA;
+    --bg-3: #F4F4F4;
+    --line: #E8E8E8;
+    --line-2: #D4D4D4;
+    --ink: #0A0A0A;
+    --ink-2: #525252;
+    --ink-3: #8A8A8A;
+    --blue: #065FD4;
+    --amber: #B38900;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--red); color: #fff; }
+
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  .display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+  .mono { font-family: 'JetBrains Mono', 'Roboto Mono', monospace; }
+
+  img { max-width: 100%; display: block; }
+
+  /* ============== TOP NAV ============== */
+  nav.top {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 64px; z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center;
+    padding: 0 32px; gap: 32px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; font-size: 18px; }
+  .brand-icon {
+    width: 36px; height: 26px;
+    background: var(--red); border-radius: 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .brand-icon::after {
+    content: ''; width: 0; height: 0;
+    border-left: 9px solid #fff;
+    border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+    margin-left: 3px;
+  }
+  .brand .sub { color: var(--ink-3); font-weight: 400; font-size: 12px; margin-left: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .nav-links { display: flex; gap: 2px; margin-left: auto; align-items: center; }
+  .nav-links a {
+    color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;
+    padding: 8px 14px; border-radius: 999px;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .nav-links a:hover { background: var(--bg-3); }
+  .nav-links a.active { background: var(--bg-3); }
+  .nav-links a.cta {
+    background: var(--ink); color: #fff;
+    margin-left: 8px;
+  }
+  .nav-links a.cta:hover { background: var(--red); }
+
+  /* ============== LAYOUT ============== */
+  main { padding-top: 64px; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--red);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-weight: 500; margin-bottom: 18px;
+  }
+  .eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--red); }
+
+  h1, h2, h3 { letter-spacing: -0.025em; line-height: 1.05; font-weight: 700; }
+  h2 { font-size: clamp(40px, 5.5vw, 76px); }
+  h3 { font-size: 22px; line-height: 1.3; letter-spacing: -0.015em; }
+  p { color: var(--ink); line-height: 1.65; }
+  .lede { font-size: 18px; color: var(--ink-2); line-height: 1.6; max-width: 60ch; }
+
+  /* italic serif accent — used a lot for editorial feel */
+  .ital { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
+  .ital-red { color: var(--red); }
+
+  /* =========================================================
+     HERO — magazine cover feel
+     ========================================================= */
+  .hero {
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-bottom: 60px;
+  }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--red-soft);
+    color: var(--red);
+    padding: 7px 14px; border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-pill .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,0,0,0.6); }
+    50% { box-shadow: 0 0 0 7px rgba(255,0,0,0); }
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 136px);
+    line-height: 0.86;
+    letter-spacing: -0.005em;
+    font-weight: 400;
+    margin-bottom: 32px;
+  }
+  .hero h1 .red { color: var(--red); }
+  .hero h1 .ital {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: -0.04em;
+    font-size: 0.92em;
+  }
+  .hero-pitch { font-size: 17px; color: var(--ink-2); line-height: 1.65; max-width: 540px; margin-bottom: 32px; }
+  .hero-pitch strong { color: var(--ink); font-weight: 600; }
+
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--ink-3);
+    text-transform: uppercase; letter-spacing: 0.15em;
+  }
+  .hero-meta span strong { color: var(--ink); font-weight: 700; margin-right: 6px; }
+
+  /* hero image */
+  .hero-img {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-3);
+  }
+  .hero-img img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: contrast(1.05) saturate(0.9);
+  }
+  .hero-img-meta {
+    position: absolute;
+    top: 16px; left: 16px;
+    display: flex; gap: 6px;
+  }
+  .hero-img-meta .tag {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(6px);
+    padding: 5px 10px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink);
+    font-weight: 500;
+  }
+  .hero-img-meta .tag.red { background: var(--red); color: #fff; }
+  .hero-img-cap {
+    position: absolute;
+    bottom: 16px; left: 16px; right: 16px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(8px);
+    padding: 14px 16px;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .hero-img-cap .src {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal; font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* hero stats strip — full width, no boxes */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 720px) { .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+  .hero-stat {
+    padding: 28px 20px 24px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--ink-3);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hero-stat .val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px; line-height: 0.9;
+    color: var(--ink);
+  }
+  .hero-stat .val .red { color: var(--red); }
+
+  /* =========================================================
+     SECTION HEADER (universal)
+     ========================================================= */
+  .section-pad { padding: 120px 0; }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: end;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-num-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    line-height: 0.85;
+    color: var(--red);
+    font-weight: 400;
+  }
+  .section-head .body { display: flex; flex-direction: column; gap: 16px; }
+  .section-head h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .section-head .lede { margin-top: 8px; }
+
+  /* =========================================================
+     BACKGROUND — editorial three-column
+     ========================================================= */
+  #background { background: var(--bg-2); border-bottom: 1px solid var(--line); }
+
+  .bg-banner {
+    position: relative;
+    margin: 0 -32px 80px;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    max-height: 480px;
+  }
+  .bg-banner img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: grayscale(0.4) contrast(1.05);
+  }
+  .bg-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.0) 100%);
+  }
+  .bg-banner-text {
+    position: absolute;
+    left: 60px; top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    max-width: 50%;
+    z-index: 2;
+  }
+  @media (max-width: 700px) {
+    .bg-banner { margin: 0 -32px 60px; }
+    .bg-banner-text { left: 24px; max-width: 80%; }
+  }
+  .bg-banner-text .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 14px;
+  }
+  .bg-banner-text h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(24px, 3.2vw, 38px);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .bg-banner-text h3 em {
+    font-style: normal;
+    color: var(--red);
+    font-weight: 500;
+  }
+  .bg-banner .credit {
+    position: absolute;
+    bottom: 12px; right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1em;
+  }
+
+  .bg-cols {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 980px) { .bg-cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  .bg-quote {
+    border-left: 3px solid var(--red);
+    padding: 4px 0 4px 24px;
+  }
+  .bg-quote .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--red);
+    text-transform: uppercase; letter-spacing: 0.15em;
+    font-weight: 500; margin-bottom: 14px;
+  }
+  .bg-quote h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 1.3;
+    margin-bottom: 18px;
+    letter-spacing: -0.01em;
+  }
+  .bg-quote h3 em { font-style: italic; color: var(--red); }
+  .bg-quote p { font-size: 15px; color: var(--ink-2); line-height: 1.65; }
+  .bg-quote p + p { margin-top: 12px; }
+  .bg-quote p strong { color: var(--ink); font-weight: 600; }
+
+  .bg-image-card {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .bg-image-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: contrast(1.08) saturate(0.85);
+  }
+  .bg-image-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.75) 100%);
+    pointer-events: none;
+  }
+  .bg-image-card .float-tag {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    z-index: 2;
+    font-weight: 500;
+  }
+  .bg-image-card .quote-overlay {
+    position: absolute;
+    bottom: 24px; left: 24px; right: 24px;
+    color: #fff; z-index: 2;
+  }
+  .bg-image-card .quote-overlay .open-quote {
+    font-family: 'Fraunces', serif;
+    font-size: 60px; line-height: 0.5;
+    color: var(--red);
+    margin-bottom: -8px;
+    display: block;
+  }
+  .bg-image-card .quote-overlay p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.4;
+    color: #fff;
+  }
+  .bg-image-card .quote-overlay .src {
+    display: block;
+    margin-top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .question-list { list-style: none; }
+  .question-list .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--red);
+    text-transform: uppercase; letter-spacing: 0.15em;
+    font-weight: 500; margin-bottom: 14px;
+  }
+  .question-list li {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .question-list li:first-of-type { padding-top: 0; }
+  .question-list li:last-child { border-bottom: none; }
+  .question-list .qtag {
+    display: inline-block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; line-height: 1;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+  .question-list p {
+    font-size: 16px; line-height: 1.55; color: var(--ink);
+  }
+  .question-list p strong { font-weight: 700; }
+
+  /* =========================================================
+     RESULT
+     ========================================================= */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+  }
+  @media (max-width: 980px) { .result-grid { grid-template-columns: 1fr; } }
+
+  .result-table-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .result-table-wrap .table-head {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-2);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .result-table-wrap .table-head h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-2);
+    font-weight: 500;
+  }
+  .result-table-wrap .table-head .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--red); text-transform: uppercase;
+    background: var(--red-soft); padding: 4px 8px; border-radius: 3px;
+  }
+  .result-table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .result-table-wrap th {
+    color: var(--ink-3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+    text-align: left; padding: 14px 22px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--line);
+  }
+  .result-table-wrap td {
+    padding: 16px 22px; border-bottom: 1px solid var(--line);
+  }
+  .result-table-wrap tr:last-child td { border-bottom: none; }
+  .result-table-wrap tr:hover td { background: var(--bg-2); }
+  .cat-name { font-weight: 500; display: flex; align-items: center; gap: 10px; }
+  .cat-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .placeholder-num { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .chart-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px;
+    display: flex; flex-direction: column;
+  }
+  .chart-card h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-2);
+    font-weight: 500; margin-bottom: 16px;
+  }
+  .chart-placeholder {
+    flex: 1;
+    border: 1px dashed var(--line-2);
+    border-radius: 4px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: var(--ink-2); text-align: center;
+    padding: 32px;
+    min-height: 280px;
+    background: var(--bg-2);
+  }
+  .chart-placeholder .icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+  .chart-placeholder strong { color: var(--ink); display: block; margin-bottom: 6px; }
+  .chart-placeholder code {
+    font-size: 11px; color: var(--blue);
+    background: rgba(6,95,212,0.08);
+    padding: 2px 8px; border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 32px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 720px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    padding: 24px 20px;
+    border-right: 1px solid var(--line);
+  }
+  .stat:last-child { border-right: none; }
+  @media (max-width: 720px) {
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--line); }
+  }
+  .stat .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; line-height: 0.9;
+    color: var(--red);
+  }
+  .stat .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--ink-3);
+    margin-top: 8px;
+  }
+
+  /* =========================================================
+     ARCHITECTURE
+     ========================================================= */
+  #architecture { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  @media (max-width: 920px) { .arch-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .arch-grid { grid-template-columns: 1fr; } }
+  .arch-step {
+    background: #fff;
+    padding: 28px 22px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.2s;
+    display: flex; flex-direction: column;
+    position: relative;
+    min-height: 220px;
+  }
+  .arch-step:hover { background: var(--ink); color: #fff; }
+  .arch-step:hover .step-num,
+  .arch-step:hover .step-tools { color: var(--red); }
+  .arch-step:hover .step-arrow { color: var(--red); transform: translateX(4px); }
+  .arch-step:hover .step-arrow svg { stroke: var(--red); }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--red);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 500; margin-bottom: 12px;
+    transition: color 0.2s;
+  }
+  .step-title {
+    font-weight: 700; font-size: 18px;
+    margin-bottom: 10px; line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .arch-step p {
+    font-size: 13px; color: inherit; opacity: 0.7;
+    line-height: 1.5; margin-bottom: 16px;
+  }
+  .step-tools {
+    margin-top: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+    transition: color 0.2s;
+  }
+  .step-arrow {
+    position: absolute;
+    top: 22px; right: 22px;
+    color: var(--ink-3);
+    transition: all 0.2s;
+  }
+  .arch-hint {
+    text-align: center;
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .arch-hint span { color: var(--red); font-weight: 500; }
+
+  /* =========================================================
+     TECH DETAIL CARDS
+     ========================================================= */
+  .tech-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 40px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .tech-card:hover { border-color: var(--line-2); }
+  .tech-card.highlight { animation: pulse-h 1.5s ease-out; }
+  @keyframes pulse-h {
+    0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.45); border-color: var(--red); }
+    100% { box-shadow: 0 0 0 12px rgba(255,0,0,0); }
+  }
+  .tech-head {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .step-badge {
+    background: var(--ink); color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    padding: 5px 10px; border-radius: 3px;
+    flex-shrink: 0; letter-spacing: 0.1em;
+  }
+  .tech-head h3 {
+    flex: 1; min-width: 200px;
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .tech-head .file {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--blue);
+    background: rgba(6,95,212,0.08);
+    padding: 4px 10px; border-radius: 3px;
+  }
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width: 760px) { .tech-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+  .tech-block h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--ink-3);
+    margin-bottom: 14px; font-weight: 500;
+  }
+  .tech-block ul { list-style: none; }
+  .tech-block li {
+    padding: 12px 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    font-size: 14px;
+    border-bottom: 1px dashed var(--line);
+    align-items: baseline;
+  }
+  .tech-block li:last-child { border-bottom: none; }
+  .tech-block li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--ink);
+    background: var(--bg-3);
+    padding: 4px 8px; border-radius: 3px;
+    white-space: nowrap; height: fit-content;
+    font-weight: 500;
+  }
+  .tech-block li .desc { color: var(--ink-2); font-size: 13.5px; line-height: 1.55; }
+  .tech-block li .desc strong { color: var(--ink); font-weight: 600; }
+
+  /* Models & Tools overview table */
+  .models-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .models-table thead th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    font-weight: 500;
+    padding: 12px 16px;
+    border-bottom: 1.5px solid var(--ink);
+    background: var(--bg-2);
+  }
+  .models-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px dashed var(--line);
+    vertical-align: middle;
+  }
+  .models-table tbody tr:last-child td { border-bottom: none; }
+  .models-table tbody tr:hover { background: var(--bg-2); }
+  .models-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--ink);
+    width: 40%;
+  }
+  .models-table tbody td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: var(--bg-3);
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .models-table .row-tag {
+    display: inline-block;
+    margin-left: 8px;
+    background: var(--red-soft);
+    color: var(--red-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+
+  /* Three layer */
+  .layer-stack { display: flex; flex-direction: column; gap: 12px; }
+  .layer {
+    background: var(--bg-2);
+    border-left: 3px solid var(--red);
+    border-radius: 0 4px 4px 0;
+    padding: 18px 22px;
+  }
+  .layer:nth-child(1) { border-left-color: #FF8888; }
+  .layer:nth-child(2) { border-left-color: var(--red); }
+  .layer:nth-child(3) { border-left-color: #B30000; }
+  .lyr-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--red);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .lyr-title { font-weight: 700; margin: 4px 0 8px; font-size: 16px; letter-spacing: -0.01em; }
+  .lyr-desc { font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+  .lyr-desc strong { color: var(--ink); font-weight: 600; }
+
+  /* =========================================================
+     INTERACTIVE DEMO
+     ========================================================= */
+  .demo-box {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .demo-box h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--ink-3);
+    margin-bottom: 16px; font-weight: 500;
+  }
+  .demo-input-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .demo-input-row input {
+    flex: 1; background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 13px 16px; border-radius: 4px;
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    outline: none; transition: all 0.2s;
+  }
+  .demo-input-row input:focus {
+    border-color: var(--red);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--red-soft);
+  }
+  .demo-input-row button {
+    background: var(--red); color: #fff;
+    border: none; padding: 0 24px;
+    border-radius: 4px;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .demo-input-row button:hover { background: var(--red-deep); }
+  .demo-input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .demo-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .preset-chip {
+    background: #fff; border: 1px solid var(--line);
+    color: var(--ink-2);
+    padding: 7px 12px; border-radius: 999px;
+    font-size: 12px; cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .preset-chip:hover {
+    border-color: var(--red); color: var(--red);
+    background: var(--red-soft);
+  }
+
+  .demo-layers .demo-layer {
+    background: var(--bg-2);
+    border-left: 3px solid var(--line);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    opacity: 0.45;
+    transition: all 0.4s ease;
+  }
+  .demo-layers .demo-layer.fired {
+    opacity: 1; background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .demo-layers .demo-layer:nth-child(1).fired { border-left-color: #FF8888; }
+  .demo-layers .demo-layer:nth-child(2).fired { border-left-color: var(--red); }
+  .demo-layers .demo-layer:nth-child(3).fired { border-left-color: #B30000; }
+  .demo-layer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .demo-layer-name {
+    font-size: 10px; font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-3); text-transform: uppercase;
+    letter-spacing: 0.15em; font-weight: 500;
+  }
+  .demo-layer.fired .demo-layer-name { color: var(--red); }
+  .demo-layer-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 700; color: var(--ink);
+  }
+  .demo-layer-detail { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .demo-layer-detail .hit {
+    background: rgba(255,0,0,0.1); color: var(--red);
+    padding: 1px 6px; border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; margin: 0 1px; font-weight: 500;
+  }
+  .demo-layer-detail .pronoun {
+    background: rgba(6,95,212,0.1); color: var(--blue);
+    padding: 1px 6px; border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; margin: 0 1px; font-weight: 500;
+  }
+  .demo-composite {
+    margin-top: 16px; padding: 18px 22px;
+    background: var(--ink); color: #fff;
+    border-radius: 4px;
+    display: flex; justify-content: space-between; align-items: center;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .demo-composite.visible { opacity: 1; }
+  .demo-composite-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.18em; color: rgba(255,255,255,0.6); font-weight: 500;
+  }
+  .demo-composite-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px; color: var(--red); line-height: 1;
+  }
+  .demo-composite-verdict { font-size: 14px; font-weight: 500; margin-top: 4px; color: #fff; }
+
+  /* =========================================================
+     LIMITATIONS
+     ========================================================= */
+  #limitations { background: var(--bg-2); border-top: 1px solid var(--line); }
+  .lim-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .lim-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--amber);
+    border-radius: 4px;
+    padding: 24px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .lim-card:hover { transform: translateY(-2px); border-left-color: var(--red); }
+  .lim-card .lim-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--amber);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 12px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .lim-card h4 { font-size: 16px; margin-bottom: 8px; letter-spacing: -0.01em; font-weight: 700; }
+  .lim-card p { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+
+  /* =========================================================
+     FOOTER
+     ========================================================= */
+  footer {
+    text-align: center;
+    padding: 80px 32px 60px;
+    border-top: 1px solid var(--line);
+    background: var(--ink);
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+  }
+  footer .red-bar {
+    width: 60px; height: 3px;
+    background: var(--red);
+    margin: 0 auto 28px;
+  }
+  footer strong { color: #fff; font-weight: 600; }
+  footer .small {
+    margin-top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  /* =========================================================
+     PRESENTATION MODE
+     ========================================================= */
+  body.present-mode { overflow: hidden; }
+  body.present-mode nav.top { display: none; }
+  body.present-mode main { padding-top: 0; }
+  body.present-mode main > section {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    margin: 0;
+    /* padding-top leaves room for the slide title to breathe;
+       padding-bottom clears the floating slide-chrome (~64px) with buffer. */
+    padding: 48px 6vw 100px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(40px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    /* "safe center" prevents the top of overflowing content from being clipped —
+       short slides still center vertically; tall slides fall back to flex-start. */
+    justify-content: safe center;
+    align-items: stretch;
+    border: none;
+  }
+  body.present-mode main > section.slide-active {
+    opacity: 1; pointer-events: auto;
+    transform: translateX(0); z-index: 5;
+  }
+  body.present-mode main > section .container {
+    padding: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  body.present-mode footer, body.present-mode .arch-hint { display: none; }
+
+  /* Force every slide variant to use the unified padding so hero, .section-pad,
+     and any other section all leave the same top/bottom margins. */
+  body.present-mode .hero,
+  body.present-mode .section-pad { padding: 48px 6vw 100px; }
+
+  /* ----- Per-slide tightening so content fits without scroll on a typical 1366×768+ screen ----- */
+  body.present-mode .section-head { margin-bottom: 28px; }
+  body.present-mode .section-num-big { font-size: clamp(64px, 7vw, 96px); line-height: 1; }
+  body.present-mode h2 { font-size: clamp(32px, 4vw, 56px); }
+  body.present-mode .lede { font-size: 16px; }
+
+  /* Hero — drop the hero-meta + image meta tags, scale image down, tighten stats */
+  body.present-mode .hero h1 { font-size: clamp(40px, 5vw, 76px); margin-bottom: 18px; }
+  body.present-mode .hero-pitch { font-size: 16px; max-width: 56ch; }
+  body.present-mode .hero-meta { display: none; }
+  body.present-mode .hero-grid { gap: 40px; align-items: center; }
+  body.present-mode .hero-img img { max-height: 46vh; object-fit: cover; }
+  body.present-mode .hero-img-meta { display: none; }
+  body.present-mode .hero-img-cap { font-size: 13px; padding: 14px 18px; }
+  body.present-mode .hero-stats { margin-top: 36px; gap: 16px; }
+  body.present-mode .hero-stat .val { font-size: clamp(28px, 3vw, 40px); }
+
+  /* Background slide — drop the bottom oversized "comment, not video" block (it's already implied by the banner + cols) */
+  body.present-mode #background > .container > div:last-child { display: none; }
+  body.present-mode .bg-banner { margin-bottom: 28px; }
+  body.present-mode .bg-banner img { max-height: 28vh; }
+  body.present-mode .bg-cols { gap: 28px; }
+
+  /* Result slide — the stat row is summary, keep table compact */
+  body.present-mode .result-grid { gap: 28px; }
+  body.present-mode .stat-row { margin-top: 28px; }
+
+  /* Architecture slide — keep 5 cards on a single row when possible */
+  body.present-mode .arch-grid { gap: 12px; }
+  body.present-mode .arch-step { padding: 18px; }
+  body.present-mode .arch-step p { font-size: 12.5px; }
+
+  /* Tech slide is intentionally long — let it scroll cleanly */
+  body.present-mode #tech { justify-content: flex-start; }
+  body.present-mode .tech-card { padding: 28px; margin-bottom: 16px; }
+  body.present-mode .tech-head { margin-bottom: 20px; padding-bottom: 16px; }
+  body.present-mode .tech-head h3 { font-size: 22px; }
+
+  /* Limitations slide — looser grid breathing room */
+  body.present-mode .lim-grid { gap: 16px; }
+
+  .slide-chrome {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    display: none; align-items: center; gap: 14px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 16px; z-index: 200;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--ink-2);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  body.present-mode .slide-chrome { display: flex; }
+  .slide-chrome button {
+    background: transparent; border: none;
+    color: var(--ink); cursor: pointer;
+    font-size: 18px; padding: 4px 10px;
+    border-radius: 50%;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .slide-chrome button:hover { background: var(--bg-3); }
+  .slide-chrome .counter { color: var(--red); font-weight: 700; letter-spacing: 0.1em; }
+  .slide-chrome .progress {
+    width: 100px; height: 2px;
+    background: var(--line); border-radius: 2px; overflow: hidden;
+  }
+  .slide-chrome .progress-fill {
+    height: 100%; background: var(--red);
+    width: 0%; transition: width 0.3s;
+  }
+  .slide-chrome .esc-hint {
+    border-left: 1px solid var(--line);
+    padding-left: 14px; color: var(--ink-3);
+    letter-spacing: 0.1em;
+  }
+  .slide-chrome kbd {
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    padding: 2px 6px; border-radius: 3px;
+    font-size: 10px; color: var(--ink);
+  }
+
+  .present-prompt {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--ink); color: #fff;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 90; cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .present-prompt:hover { background: var(--red); }
+  .present-prompt kbd {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 2px 6px; border-radius: 3px;
+    font-size: 10px;
+  }
+  body.present-mode .present-prompt { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="brand">
+    <span class="brand-icon"></span>
+    <span>DepSignal<span class="sub">research</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="#background">Background</a>
+    <a href="#result">Result</a>
+    <a href="#architecture">Framework</a>
+    <a href="#tech">Tech Details</a>
+    <a href="#limitations">Limits</a>
+    <a href="#" class="cta" id="enter-present">▶ Present</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============== HERO ============== -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-pill"><span class="dot"></span>NLP × Mental Health × Public Discourse</span>
+        <h1>
+          The <span class="red">quiet</span><br>
+          signals beneath<br>
+          <span class="ital">a music video.</span>
+        </h1>
+        <p class="hero-pitch">
+          Measuring the <strong>natural prevalence</strong> and <strong>linguistic patterns</strong> of depression-indicative language across diverse high-traffic YouTube video categories — using a three-layer NLP pipeline applied to organic public comment sections, not depression-specific communities.
+        </p>
+        <div class="hero-meta">
+          <span><strong>Apr 2026</strong> · Research</span>
+          <span><strong>NLP / NLP+</strong> · Methods</span>
+          <span><strong>~12.5K</strong> · Comments</span>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=1200&q=85&auto=format&fit=crop" alt="Person at window, contemplative" />
+        <div class="hero-img-meta">
+          <span class="tag red">comment.txt</span>
+          <span class="tag">N = 12,500</span>
+        </div>
+        <div class="hero-img-cap">
+          "I've been feeling so empty lately, this song is the only thing that hits."
+          <span class="src">— example comment, music video</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="lbl">Categories</div><div class="val"><span class="red">5</span></div></div>
+      <div class="hero-stat"><div class="lbl">Videos</div><div class="val">~250</div></div>
+      <div class="hero-stat"><div class="lbl">Comments</div><div class="val">~12.5K</div></div>
+      <div class="hero-stat"><div class="lbl">Detection Layers</div><div class="val"><span class="red">3</span></div></div>
+      <div class="hero-stat"><div class="lbl">Models Compared</div><div class="val">3</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BACKGROUND ============== -->
+<section id="background" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num-big">01</div>
+      <div class="body">
+        <span class="eyebrow">Background &amp; Motivation</span>
+        <h2>Why measure depression language in <span class="ital ital-red">general-interest</span> videos?</h2>
+      </div>
+    </div>
+
+    <!-- editorial banner -->
+    <div class="bg-banner">
+      <img src="https://images.unsplash.com/photo-1494368308039-ed3393a402a4?w=1800&q=85&auto=format&fit=crop" alt="Atmospheric photograph evoking solitude" />
+      <div class="bg-banner-text">
+        <div class="label">— THE GAP IN PRIOR WORK</div>
+        <h3>Most studies sample from communities where users have <em>already</em> self-identified as depressed.</h3>
+      </div>
+      <span class="credit">Photo · Unsplash</span>
+    </div>
+
+    <!-- three-column editorial -->
+    <div class="bg-cols">
+      <div class="bg-quote">
+        <div class="label">The Problem</div>
+        <h3>Self-selection <em>biases</em> what we see.</h3>
+        <p>
+          Most prior work collects data from depression-specific communities like
+          <strong>r/depression</strong>. Users there have already sought out a space
+          to express distress.
+        </p>
+        <p>
+          That's a clean signal — but it doesn't tell us how depression-related
+          expression surfaces in <strong>ordinary</strong> public discourse, where
+          people don't go looking to be heard.
+        </p>
+      </div>
+
+      <div class="bg-image-card">
+        <span class="float-tag">FIELD NOTE</span>
+        <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=900&q=85&auto=format&fit=crop" alt="Atmospheric mood image" />
+        <div class="quote-overlay">
+          <span class="open-quote">"</span>
+          <p>I've been struggling so much lately, this is the only thing keeping me going.</p>
+          <span class="src">— Beneath a music video, found in pilot data</span>
+        </div>
+      </div>
+
+      <div class="question-list">
+        <div class="label">Research Questions</div>
+        <ul>
+          <li>
+            <span class="qtag">Q1</span>
+            <p>Across YouTube content categories, how does the <strong>natural prevalence</strong> of depression-indicative language vary?</p>
+          </li>
+          <li>
+            <span class="qtag">Q2</span>
+            <p>To what extent does video-level <strong>contextual framing</strong> shape the linguistic patterns of depression-related self-disclosure?</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
+      <div>
+        <h3 class="ital" style="font-size: clamp(24px, 2.6vw, 32px); font-weight: 400; line-height: 1.3; max-width: 28ch;">
+          The unit of analysis is the <em style="color: var(--red);">comment</em>, not the video.
+        </h3>
+      </div>
+      <div>
+        <p style="font-size: 15px; color: var(--ink-2); line-height: 1.7;">
+          A music video has no depression relevance. But a comment underneath it — "I've been feeling so empty lately" — does. We sample from mainstream content across five categories, then scan every comment with a three-layer detector. This better reflects the true prevalence of depression-related expression in everyday online discourse, and lets us compare how that expression differs across content contexts.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== RESULT ============== -->
+<section id="result" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num-big">02</div>
+      <div class="body">
+        <span class="eyebrow">Core Result</span>
+        <h2>Depression signal rates across five categories.</h2>
+        <p class="lede">
+          The primary deliverable: a cross-category comparison of three measures — depression signal rate, average sentiment, and self-disclosure rate. Differences tested with ANOVA / KS-test.
+        </p>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-table-wrap">
+        <div class="table-head">
+          <h4>Cross-Category Comparison</h4>
+          <span class="badge">Primary Result</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Signal Rate</th>
+              <th>Avg Sentiment</th>
+              <th>Self-Disclosure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:#FF0000"></span>Mental Health</div></td>
+              <td><span class="placeholder-num">— measured —</span></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:#FF8888"></span>Personal Vlog</div></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:#FFCC00"></span>Fitness / Wellness</div></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:#065FD4"></span>News / Current Events</div></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="cat-name"><span class="cat-dot" style="background:#2BA640"></span>Music / Entertainment</div></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+              <td><span class="placeholder-num">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-card">
+        <h4>Visualization</h4>
+        <div class="chart-placeholder">
+          <div class="icon">📊</div>
+          <strong>t-SNE / Heatmap</strong>
+          <div style="font-size: 13px; color: var(--ink-2); margin-bottom: 8px;">replace with PNG export from</div>
+          <code>linking.py</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><div class="num">5</div><div class="lbl">Content Categories</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Detection Layers</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Clustering Methods</div></div>
+      <div class="stat"><div class="num">5×</div><div class="lbl">CV Folds, F1-Macro</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ARCHITECTURE ============== -->
+<section id="architecture" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num-big">03</div>
+      <div class="body">
+        <span class="eyebrow">Pipeline Framework</span>
+        <h2>Five stages, one signal per comment.</h2>
+        <p class="lede">Click any module to jump to its technical detail.</p>
+      </div>
+    </div>
+
+    <div class="arch-grid">
+      <a class="arch-step" href="#step-0">
+        <div class="step-num">STEP 00</div>
+        <div class="step-title">Data Collection</div>
+        <p>Crawl videos &amp; top-50 comments per video across 5 categories.</p>
+        <div class="step-tools">YouTube Data API v3</div>
+        <div class="step-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+      <a class="arch-step" href="#step-1">
+        <div class="step-num">STEP 01</div>
+        <div class="step-title">Video Feature Extraction</div>
+        <p>Sentiment &amp; framing features from titles + descriptions.</p>
+        <div class="step-tools">VADER · TextBlob</div>
+        <div class="step-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+      <a class="arch-step" href="#step-2">
+        <div class="step-num">STEP 02</div>
+        <div class="step-title">Comment Depression Detection</div>
+        <p>Three-layer depression signal detection per comment.</p>
+        <div class="step-tools">VADER · LIWC+TF-IDF · spaCy</div>
+        <div class="step-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+      <a class="arch-step" href="#step-3">
+        <div class="step-num">STEP 03</div>
+        <div class="step-title">Cross-Category Analysis</div>
+        <p>Embeddings, clustering, dimensionality reduction, statistical tests.</p>
+        <div class="step-tools">MiniLM · HDBSCAN · t-SNE</div>
+        <div class="step-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+      <a class="arch-step" href="#step-4">
+        <div class="step-num">STEP 04</div>
+        <div class="step-title">Supervised Classification</div>
+        <p>5-fold cross-validation, F1-macro evaluation.</p>
+        <div class="step-tools">LogReg · NB · SVM</div>
+        <div class="step-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </div>
+    <p class="arch-hint">Click any module above to jump to <span>technical details ↓</span></p>
+  </div>
+</section>
+
+<!-- ============== TECH DETAILS ============== -->
+<section id="tech" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num-big">04</div>
+      <div class="body">
+        <span class="eyebrow">Technical Details</span>
+        <h2>How each stage works.</h2>
+      </div>
+    </div>
+
+    <!-- Models & Tools overview (mirrors PPT slide 7) -->
+    <div class="tech-card" id="models-tools">
+      <div class="tech-head">
+        <span class="step-badge">OVERVIEW</span>
+        <h3>Models &amp; Tools</h3>
+        <span class="file">stack.md</span>
+      </div>
+      <p class="lede" style="margin-bottom: 22px; font-size: 15px;">
+        End-to-end stack — every task in the pipeline maps to one named model or library. Same toolchain across all five categories so cross-category comparison is apples-to-apples.
+      </p>
+      <table class="models-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Model / Tool</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Sentiment <span class="row-tag">Layer 1</span></td><td><code>VADER</code> · <code>TextBlob</code> · <code>AFINN</code></td></tr>
+          <tr><td>Lexicon Matching <span class="row-tag">Layer 2</span></td><td><code>LIWC + TF-IDF (bigrams)</code></td></tr>
+          <tr><td>Self-Disclosure <span class="row-tag">Layer 3</span></td><td><code>spaCy POS + pronoun patterns</code></td></tr>
+          <tr><td>Comment Embedding</td><td><code>sentence-transformers/all-MiniLM-L6-v2</code></td></tr>
+          <tr><td>Clustering</td><td><code>HDBSCAN</code> · <code>GMM (AIC/BIC)</code></td></tr>
+          <tr><td>Dimensionality Reduction</td><td><code>PCA (50D) → t-SNE (2D)</code></td></tr>
+          <tr><td>Classification</td><td><code>LogReg</code> · <code>NaiveBayes</code> · <code>LinearSVM</code></td></tr>
+          <tr><td>Cross-Validation</td><td><code>5-fold · F1-macro</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="step-0" class="tech-card">
+      <div class="tech-head">
+        <span class="step-badge">STEP 00</span>
+        <h3>Data Collection Strategy</h3>
+        <span class="file">collect.py</span>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-block">
+          <h4>Sampling Logic</h4>
+          <ul>
+            <li><code>top-N</code><span class="desc">Within each category, rank videos by view count and select top N.</span></li>
+            <li><code>top-50</code><span class="desc">Per video: 50 most-liked comments, with video_id as foreign key.</span></li>
+            <li><code>no filter</code><span class="desc">No depression keywords used — relevance determined post-hoc at the comment level.</span></li>
+          </ul>
+        </div>
+        <div class="tech-block">
+          <h4>Five Categories</h4>
+          <ul>
+            <li><code>baseline</code><span class="desc"><strong>Mental Health</strong> — expected higher depression signal rate</span></li>
+            <li><code>adjacent</code><span class="desc"><strong>Fitness / Wellness</strong> — adjacent to mental health; motivational framing</span></li>
+            <li><code>mainstream</code><span class="desc"><strong>Music / Entertainment</strong> — high-traffic mainstream content; general audience</span></li>
+            <li><code>charged</code><span class="desc"><strong>News / Current Events</strong> — emotionally charged but non-personal framing</span></li>
+            <li><code>narrative</code><span class="desc"><strong>Personal Vlog</strong> — first-person narrative; higher self-disclosure potential</span></li>
+          </ul>
+          <p style="font-size:12px;color:var(--ink-3);margin-top:14px;font-family:'JetBrains Mono',monospace;">
+            Target ≈ 40–50 videos per category · ~250 total · ~12.5K comments (top-50 by likes per video)
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="step-1" class="tech-card">
+      <div class="tech-head">
+        <span class="step-badge">STEP 01</span>
+        <h3>Video-Level NLP Features</h3>
+        <span class="file">video_analysis.py</span>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-block">
+          <h4>Sentiment &amp; Tone</h4>
+          <ul>
+            <li><code>VADER</code><span class="desc">Compound score for title and description</span></li>
+            <li><code>TextBlob</code><span class="desc">Polarity (secondary signal) + subjectivity (personal framing)</span></li>
+          </ul>
+        </div>
+        <div class="tech-block">
+          <h4>Structure</h4>
+          <ul>
+            <li><code>word_count</code><span class="desc">Description length</span></li>
+            <li><code>lex_diversity</code><span class="desc">unique tokens / total tokens</span></li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: var(--ink-2); margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--line); font-family: 'JetBrains Mono', monospace;">
+        → joined with comments in Step 3 to test whether video framing correlates with comment-level signal patterns.
+      </p>
+    </div>
+
+    <div id="step-2" class="tech-card">
+      <div class="tech-head">
+        <span class="step-badge">STEP 02</span>
+        <h3>Three-Layer Detection</h3>
+        <span class="file">comment_analysis.py</span>
+      </div>
+      <p class="lede" style="margin-bottom: 22px; font-size: 15px;">
+        Sentiment alone is not enough — <em class="ital">"this video is garbage"</em> is negative but not depression-indicative. Three layers of increasing specificity:
+      </p>
+      <div class="layer-stack">
+        <div class="layer">
+          <div class="lyr-label">Layer 1 · Broad Signal</div>
+          <div class="lyr-title">Multi-tool sentiment scoring</div>
+          <div class="lyr-desc">
+            Each comment scored independently by <strong>VADER</strong> (compound), <strong>TextBlob</strong> (polarity + subjectivity), and <strong>AFINN</strong> (word-level valence sum) — three tools for a more robust signal than any single model.
+          </div>
+        </div>
+        <div class="layer">
+          <div class="lyr-label">Layer 2 · Domain-Specific</div>
+          <div class="lyr-title">TF-IDF weighted lexicon matching</div>
+          <div class="lyr-desc">
+            Match against <strong>LIWC</strong> categories (negative emotion, sadness, anxiety, health) + a depression-specific wordlist. <strong>TF-IDF weighting with locked vocabulary</strong> captures how prominently depression-relevant terms appear, extended to <strong>bigrams</strong> ("feel hopeless", "can't sleep").
+          </div>
+        </div>
+        <div class="layer">
+          <div class="lyr-label">Layer 3 · High-Precision</div>
+          <div class="lyr-title">Self-disclosure pattern detection</div>
+          <div class="lyr-desc">
+            <strong>spaCy POS tagging</strong> identifies first-person pronoun + depression-vocabulary combinations ("I feel hopeless", "I've been struggling"). Captures genuine personal disclosure rather than reactions to video content. Strongest research signal.
+          </div>
+        </div>
+      </div>
+      <div class="tech-grid" style="margin-top: 28px;">
+        <div class="tech-block">
+          <h4>Aggregate Output</h4>
+          <ul>
+            <li><code>composite</code><span class="desc">Per-comment signal score combining all 3 layers</span></li>
+          </ul>
+        </div>
+        <div class="tech-block">
+          <h4>Auxiliary Features</h4>
+          <ul>
+            <li><code>lex_diversity</code><span class="desc">Depressive language tends to be repetitive</span></li>
+            <li><code>word_count</code><span class="desc">Filter very short comments (&lt;5 words)</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="demo-box">
+        <h4>▶ Try it · interactive demo</h4>
+        <div class="demo-input-row">
+          <input id="demo-input" type="text" placeholder='Type a comment, e.g. "I have been struggling lately..."' />
+          <button id="demo-run">Analyze</button>
+        </div>
+        <div class="demo-presets">
+          <button class="preset-chip" data-preset="I've been feeling so hopeless lately, I can't sleep at all">😔 self-disclosure</button>
+          <button class="preset-chip" data-preset="this video is absolute garbage what a waste of time">😠 negative non-disclosure</button>
+          <button class="preset-chip" data-preset="omg this song hits different I love it so much">🎵 positive emotional</button>
+          <button class="preset-chip" data-preset="depression rates are rising according to new research">📰 topical mention</button>
+          <button class="preset-chip" data-preset="i feel so empty inside nothing makes me happy anymore">💔 deep disclosure</button>
+        </div>
+
+        <div class="demo-layers">
+          <div class="demo-layer" id="dl-1">
+            <div class="demo-layer-header">
+              <span class="demo-layer-name">Layer 1 · Sentiment</span>
+              <span class="demo-layer-score" id="dl-1-score">—</span>
+            </div>
+            <div class="demo-layer-detail" id="dl-1-detail">VADER + TextBlob + AFINN composite. Run a comment to see scores.</div>
+          </div>
+          <div class="demo-layer" id="dl-2">
+            <div class="demo-layer-header">
+              <span class="demo-layer-name">Layer 2 · Lexicon TF-IDF</span>
+              <span class="demo-layer-score" id="dl-2-score">—</span>
+            </div>
+            <div class="demo-layer-detail" id="dl-2-detail">Matches against LIWC + depression wordlist (incl. bigrams).</div>
+          </div>
+          <div class="demo-layer" id="dl-3">
+            <div class="demo-layer-header">
+              <span class="demo-layer-name">Layer 3 · Self-Disclosure</span>
+              <span class="demo-layer-score" id="dl-3-score">—</span>
+            </div>
+            <div class="demo-layer-detail" id="dl-3-detail">First-person pronoun + depression vocabulary patterns.</div>
+          </div>
+        </div>
+
+        <div class="demo-composite" id="demo-composite">
+          <div>
+            <div class="demo-composite-label">Composite Signal</div>
+            <div class="demo-composite-verdict" id="demo-verdict">—</div>
+          </div>
+          <div class="demo-composite-score" id="demo-composite-score">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="step-3" class="tech-card">
+      <div class="tech-head">
+        <span class="step-badge">STEP 03</span>
+        <h3>Clustering &amp; Visualization</h3>
+        <span class="file">linking.py</span>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-block">
+          <h4>Embedding</h4>
+          <ul>
+            <li><code>MiniLM-L6-v2</code><span class="desc">sentence-transformers, 384-dim comment embeddings</span></li>
+          </ul>
+          <h4 style="margin-top:24px;">Clustering (both reported)</h4>
+          <ul>
+            <li><code>HDBSCAN</code><span class="desc">Density-based, no preset k, handles noise</span></li>
+            <li><code>GMM</code><span class="desc">Soft clustering with AIC/BIC selection — better for emotionally ambiguous comments</span></li>
+          </ul>
+        </div>
+        <div class="tech-block">
+          <h4>Dimensionality Reduction</h4>
+          <ul>
+            <li><code>PCA → 50</code><span class="desc">Removes noise, preserves global structure</span></li>
+            <li><code>t-SNE → 2</code><span class="desc">Preserves local neighbors for 2D visualization</span></li>
+          </ul>
+          <h4 style="margin-top:24px;">Statistical Tests</h4>
+          <ul>
+            <li><code>ANOVA</code><span class="desc">Mean signal differences across categories</span></li>
+            <li><code>KS-test</code><span class="desc">Distribution differences across categories</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="step-4" class="tech-card">
+      <div class="tech-head">
+        <span class="step-badge">STEP 04</span>
+        <h3>Supervised Classification</h3>
+        <span class="file">modeling.py</span>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-block">
+          <h4>Models Compared</h4>
+          <ul>
+            <li><code>LogReg</code><span class="desc">Strong text-classification baseline</span></li>
+            <li><code>NaiveBayes</code><span class="desc">Efficient on sparse TF-IDF features</span></li>
+            <li><code>LinearSVM</code><span class="desc">Strong on high-dimensional text</span></li>
+          </ul>
+        </div>
+        <div class="tech-block">
+          <h4>Evaluation Protocol</h4>
+          <ul>
+            <li><code>Pipeline</code><span class="desc">sklearn standardized: TF-IDF → classifier</span></li>
+            <li><code>5-fold CV</code><span class="desc">Stable estimates, not sensitive to single split</span></li>
+            <li><code>F1-macro</code><span class="desc">Accounts for class imbalance</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== LIMITATIONS ============== -->
+<section id="limitations" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num-big">05</div>
+      <div class="body">
+        <span class="eyebrow">Limitations</span>
+        <h2>What we are <span class="ital" style="color: var(--amber);">not</span> claiming.</h2>
+      </div>
+    </div>
+
+    <div class="lim-grid">
+      <div class="lim-card">
+        <div class="lim-tag">⚠ Comment ≠ Commenter</div>
+        <h4>Language ≠ Diagnosis</h4>
+        <p>Depression-indicative language does not imply the commenter has depression.</p>
+      </div>
+      <div class="lim-card">
+        <div class="lim-tag">⚠ Sentiment ≠ Depression</div>
+        <h4>Necessary but not sufficient</h4>
+        <p>Negative sentiment alone is not enough — three-layer method addresses this; false positives still possible.</p>
+      </div>
+      <div class="lim-card">
+        <div class="lim-tag">⚠ Top-Comment Bias</div>
+        <h4>Loud voices dominate</h4>
+        <p>Sorting by likes favors emotionally resonant language; quieter expressions of distress may be underrepresented.</p>
+      </div>
+      <div class="lim-card">
+        <div class="lim-tag">⚠ No Clinical Ground Truth</div>
+        <h4>Linguistic proxies</h4>
+        <p>All labels are linguistic proxies, not clinical assessments. Results measure depression-indicative pattern prevalence in public discourse — not diagnostic prevalence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="red-bar"></div>
+  <div><strong>YouTube Comment Depression-Signal Study</strong> · Research Presentation</div>
+  <div style="margin-top:8px;">Measuring natural prevalence, not making clinical claims.</div>
+  <div class="small">DepSignal · 2026</div>
+</footer>
+
+<div class="present-prompt" id="present-prompt">
+  Press <kbd>P</kbd> to present
+</div>
+
+<div class="slide-chrome">
+  <button id="prev-slide" title="Previous (←)">‹</button>
+  <span><span class="counter" id="slide-counter">1</span> / <span id="slide-total">6</span></span>
+  <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+  <button id="next-slide" title="Next (→)">›</button>
+  <span class="esc-hint"><kbd>ESC</kbd> EXIT</span>
+</div>
+
+<script>
+  // ===== Architecture diagram → tech card highlight =====
+  document.querySelectorAll('.arch-step').forEach(step => {
+    step.addEventListener('click', (e) => {
+      const targetId = step.getAttribute('href').slice(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        document.querySelectorAll('.tech-card.highlight').forEach(c => c.classList.remove('highlight'));
+        setTimeout(() => target.classList.add('highlight'), 600);
+        setTimeout(() => target.classList.remove('highlight'), 2200);
+      }
+    });
+  });
+
+  // ===== Active nav link =====
+  const sections = document.querySelectorAll('main section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    if (document.body.classList.contains('present-mode')) return;
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 120;
+      if (window.scrollY >= top) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  });
+
+  // ===== Presentation Mode =====
+  const slides = Array.from(document.querySelectorAll('main > section'));
+  const totalSlides = slides.length;
+  document.getElementById('slide-total').textContent = totalSlides;
+  let currentSlide = 0;
+
+  function enterPresentMode(startIndex = 0) {
+    document.body.classList.add('present-mode');
+    currentSlide = startIndex;
+    showSlide(currentSlide);
+  }
+  function exitPresentMode() {
+    document.body.classList.remove('present-mode');
+    slides.forEach(s => s.classList.remove('slide-active'));
+    const target = slides[currentSlide];
+    if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
+  function showSlide(idx) {
+    if (idx < 0 || idx >= totalSlides) return;
+    slides.forEach((s, i) => s.classList.toggle('slide-active', i === idx));
+    document.getElementById('slide-counter').textContent = idx + 1;
+    document.getElementById('progress-fill').style.width = ((idx + 1) / totalSlides * 100) + '%';
+    slides[idx].scrollTop = 0;
+  }
+  function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; showSlide(currentSlide); } }
+  function prevSlide() { if (currentSlide > 0) { currentSlide--; showSlide(currentSlide); } }
+
+  document.getElementById('enter-present').addEventListener('click', (e) => {
+    e.preventDefault();
+    let startIdx = 0;
+    const scrollPos = window.scrollY + 200;
+    slides.forEach((s, i) => { if (s.offsetTop <= scrollPos) startIdx = i; });
+    enterPresentMode(startIdx);
+  });
+  document.getElementById('present-prompt').addEventListener('click', () => enterPresentMode(0));
+  document.getElementById('next-slide').addEventListener('click', nextSlide);
+  document.getElementById('prev-slide').addEventListener('click', prevSlide);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    const inPresent = document.body.classList.contains('present-mode');
+    if (e.key === 'p' || e.key === 'P') {
+      if (!inPresent) enterPresentMode(0);
+    } else if (e.key === 'Escape' && inPresent) {
+      exitPresentMode();
+    } else if (inPresent) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault(); nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); currentSlide = 0; showSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); currentSlide = totalSlides - 1; showSlide(currentSlide); }
+    }
+  });
+
+  // ===== Step 2 — Interactive 3-Layer Detector =====
+  const SENTIMENT_LEX = {
+    'sad': -2.5, 'depressed': -3.5, 'hopeless': -3.5, 'empty': -2.8, 'lonely': -2.8,
+    'worthless': -3.2, 'tired': -1.8, 'exhausted': -2.2, 'numb': -2.5, 'broken': -2.6,
+    'struggling': -2.4, 'crying': -2.4, 'hurt': -2.2, 'pain': -2.4, 'suffer': -2.5,
+    'anxious': -2.4, 'scared': -2.0, 'afraid': -2.0, 'awful': -2.2, 'terrible': -2.4,
+    'horrible': -2.4, 'bad': -1.5, 'worst': -2.6, 'hate': -2.6, 'garbage': -2.0,
+    'waste': -1.5, 'nothing': -1.0, 'nobody': -1.5, 'alone': -1.8, 'lost': -1.8,
+    'dark': -1.2, 'cold': -0.8, 'fail': -2.0, 'failed': -2.0, 'failure': -2.4,
+    "can't": -1.0, 'cannot': -1.0, 'never': -0.8,
+    'love': 2.6, 'amazing': 2.8, 'beautiful': 2.6, 'happy': 2.4, 'great': 2.0,
+    'good': 1.5, 'wonderful': 2.6, 'best': 2.4, 'awesome': 2.8, 'perfect': 2.4,
+    'hits': 1.6, 'different': 0.4, 'thank': 1.8, 'thanks': 1.5,
+  };
+  function layer1(text) {
+    const tokens = text.toLowerCase().match(/[a-z']+/g) || [];
+    let sum = 0; let hits = [];
+    tokens.forEach(t => { if (SENTIMENT_LEX[t] !== undefined) { sum += SENTIMENT_LEX[t]; hits.push({ word: t, score: SENTIMENT_LEX[t] }); } });
+    const compound = sum / Math.sqrt(sum * sum + 15);
+    return { compound, hits, tokenCount: tokens.length };
+  }
+
+  const DEP_UNIGRAMS = new Set([
+    'depressed','depression','hopeless','sad','empty','lonely','worthless','tired',
+    'exhausted','numb','broken','struggling','crying','hurt','pain','anxious',
+    'anxiety','suicide','suicidal','dying','die','death','alone','isolated',
+    'meaningless','pointless','suffering','despair','dread','tears','sobbing',
+    'unloved','useless','failure','overwhelmed','drained',
+  ]);
+  const DEP_BIGRAMS = new Set([
+    'feel hopeless','feel empty','feel sad','feel alone','feel worthless','feel numb',
+    "can't sleep",'cant sleep','no energy','no motivation','want to die','give up',
+    'no point','nothing matters','too much','so tired','so empty','so alone',
+    'been struggling','been crying','keeping me','only thing','barely functioning',
+  ]);
+  function layer2(text) {
+    const lower = text.toLowerCase();
+    const tokens = lower.match(/[a-z']+/g) || [];
+    if (tokens.length === 0) return { score: 0, hits: [], coverage: 0 };
+    let hits = [];
+    tokens.forEach(t => { if (DEP_UNIGRAMS.has(t)) hits.push(t); });
+    for (let i = 0; i < tokens.length - 1; i++) {
+      const bg = tokens[i] + ' ' + tokens[i+1];
+      if (DEP_BIGRAMS.has(bg)) hits.push(bg);
+    }
+    const uniqueHits = Array.from(new Set(hits));
+    const score = uniqueHits.length / Math.sqrt(tokens.length);
+    return { score, hits: uniqueHits, coverage: uniqueHits.length / tokens.length };
+  }
+
+  const FIRST_PERSON = new Set(["i","i'm","im","i've","ive","i'd","id","i'll","ill","my","me","myself","mine"]);
+  function layer3(text) {
+    const lower = text.toLowerCase();
+    const tokens = lower.match(/[a-z']+/g) || [];
+    const matches = [];
+    tokens.forEach((t, i) => {
+      if (FIRST_PERSON.has(t)) {
+        const window = tokens.slice(i, Math.min(i + 5, tokens.length));
+        for (let j = 1; j < window.length; j++) {
+          if (DEP_UNIGRAMS.has(window[j])) {
+            matches.push({ pronoun: t, target: window[j], snippet: window.slice(0, j+1).join(' ') });
+            break;
+          }
+          if (j < window.length - 1) {
+            const bg = window[j] + ' ' + window[j+1];
+            if (DEP_BIGRAMS.has(bg)) {
+              matches.push({ pronoun: t, target: bg, snippet: window.slice(0, j+2).join(' ') });
+              break;
+            }
+          }
+        }
+      }
+    });
+    const seen = new Set();
+    const unique = matches.filter(m => { if (seen.has(m.snippet)) return false; seen.add(m.snippet); return true; });
+    const score = Math.min(1, unique.length * 0.6);
+    return { score, matches: unique };
+  }
+
+  function composite(l1, l2, l3) {
+    const sentiContrib = Math.max(0, -l1.compound) * 0.25;
+    const lexContrib = Math.min(1, l2.score) * 0.35;
+    const discContrib = l3.score * 0.40;
+    return Math.min(1, sentiContrib + lexContrib + discContrib);
+  }
+
+  function highlightText(text, words, cls) {
+    if (!words.length) return escapeHtml(text);
+    let escaped = escapeHtml(text);
+    const sorted = [...words].sort((a,b) => b.length - a.length);
+    sorted.forEach(w => {
+      const re = new RegExp('\\b(' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')\\b', 'gi');
+      escaped = escaped.replace(re, `<span class="${cls}">$1</span>`);
+    });
+    return escaped;
+  }
+  function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function runDemo() {
+    const text = document.getElementById('demo-input').value.trim();
+    if (!text) return;
+    const runBtn = document.getElementById('demo-run');
+    runBtn.disabled = true;
+    ['dl-1','dl-2','dl-3'].forEach(id => document.getElementById(id).classList.remove('fired'));
+    document.getElementById('demo-composite').classList.remove('visible');
+
+    const l1 = layer1(text);
+    const l2 = layer2(text);
+    const l3 = layer3(text);
+    const comp = composite(l1, l2, l3);
+
+    setTimeout(() => {
+      document.getElementById('dl-1').classList.add('fired');
+      document.getElementById('dl-1-score').textContent = l1.compound.toFixed(2);
+      const hitWords = l1.hits.map(h => h.word);
+      const hl = hitWords.length ? highlightText(text, hitWords, 'hit') : escapeHtml(text);
+      document.getElementById('dl-1-detail').innerHTML =
+        `<div style="margin-bottom:6px;">${hl}</div>` +
+        `<span style="font-size:11px;color:var(--ink-3);">VADER-style compound · ${l1.hits.length} sentiment word(s)</span>`;
+    }, 200);
+
+    setTimeout(() => {
+      document.getElementById('dl-2').classList.add('fired');
+      document.getElementById('dl-2-score').textContent = l2.score.toFixed(2);
+      const hl = l2.hits.length ? highlightText(text, l2.hits, 'hit') : escapeHtml(text);
+      document.getElementById('dl-2-detail').innerHTML =
+        `<div style="margin-bottom:6px;">${hl}</div>` +
+        `<span style="font-size:11px;color:var(--ink-3);">${l2.hits.length} depression-lexicon match(es) · TF-IDF-weighted</span>`;
+    }, 900);
+
+    setTimeout(() => {
+      document.getElementById('dl-3').classList.add('fired');
+      document.getElementById('dl-3-score').textContent = l3.score.toFixed(2);
+      let detailHtml;
+      if (l3.matches.length === 0) {
+        detailHtml = `<span style="color:var(--ink-3);">No first-person + depression-vocabulary pattern detected.</span>`;
+      } else {
+        const patterns = l3.matches.map(m =>
+          `<span class="pronoun">${m.pronoun}</span> → <span class="hit">${m.target}</span>`
+        ).join(' &nbsp;·&nbsp; ');
+        detailHtml = patterns +
+          `<div style="font-size:11px;color:var(--ink-3);margin-top:6px;">` +
+          `${l3.matches.length} self-disclosure pattern(s) — strongest signal layer.</div>`;
+      }
+      document.getElementById('dl-3-detail').innerHTML = detailHtml;
+    }, 1600);
+
+    setTimeout(() => {
+      const cBox = document.getElementById('demo-composite');
+      cBox.classList.add('visible');
+      document.getElementById('demo-composite-score').textContent = comp.toFixed(2);
+      const verdictEl = document.getElementById('demo-verdict');
+      if (comp >= 0.5) {
+        verdictEl.textContent = 'Strong depression signal — likely self-disclosure';
+      } else if (comp >= 0.2) {
+        verdictEl.textContent = 'Moderate signal — flagged for review';
+      } else {
+        verdictEl.textContent = 'Low / no depression signal';
+      }
+      runBtn.disabled = false;
+    }, 2300);
+  }
+
+  document.getElementById('demo-run').addEventListener('click', runDemo);
+  document.getElementById('demo-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') runDemo(); });
+  document.querySelectorAll('.preset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.getElementById('demo-input').value = chip.dataset.preset;
+      runDemo();
+    });
+  });
+</script>
+
+</body>
+</html>

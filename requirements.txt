@@ -1,13 +1,29 @@
+# Step 0 — data collection
 google-api-python-client>=2.0
 python-dotenv>=1.0
 pytz>=2024.1
 
-# Step 2 — comment analysis
-transformers>=4.40
-torch>=2.0
+# Step 1 — video analysis
+vaderSentiment>=3.3.2
+textblob>=0.18
+
+# Step 2 — comment analysis (3-layer detection)
+afinn>=0.1
+spacy>=3.7
+scikit-learn>=1.3
 sentence-transformers>=2.6
+torch>=2.0
+
+# Step 3 — linking / clustering / visualization
+scipy>=1.11
 hdbscan>=0.8.33
-umap-learn>=0.5.5
+matplotlib>=3.8
+seaborn>=0.13
+
+# Common
 pandas>=2.0
 numpy>=1.26
 tqdm>=4.66
+
+# spaCy English model — install with:
+#   python -m spacy download en_core_web_sm

@@ -14,92 +14,92 @@
     "music_entertainment": 1219
   },
   "anova": {
-    "F": 542.9315432784525,
+    "F": 586.3893976730078,
     "p_value": 0.0
   },
   "kruskal_wallis": {
-    "H": 1268.4034465087702,
-    "p_value": 2.3583206007010097e-273
+    "H": 1491.813157404582,
+    "p_value": 0.0
   },
   "pairwise_ks": [
     {
       "cat_a": "mental_health",
       "cat_b": "personal_vlog",
-      "ks_stat": 0.4261539398368043,
-      "p_value": 1.150834841416457e-195,
-      "p_bonferroni": 1.1508348414164568e-194,
+      "ks_stat": 0.40608330288637196,
+      "p_value": 3.6746053921116545e-177,
+      "p_bonferroni": 3.674605392111655e-176,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "mental_health",
       "cat_b": "fitness_wellness",
-      "ks_stat": 0.35713893727561885,
-      "p_value": 3.42352275957084e-139,
-      "p_bonferroni": 3.42352275957084e-138,
+      "ks_stat": 0.35800781337962445,
+      "p_value": 6.991385288778909e-140,
+      "p_bonferroni": 6.99138528877891e-139,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "mental_health",
       "cat_b": "news_current_events",
-      "ks_stat": 0.3118847539015606,
-      "p_value": 8.081521288483011e-107,
-      "p_bonferroni": 8.081521288483011e-106,
+      "ks_stat": 0.3753501400560224,
+      "p_value": 1.0375852233108735e-155,
+      "p_bonferroni": 1.0375852233108736e-154,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "mental_health",
       "cat_b": "music_entertainment",
-      "ks_stat": 0.4117010216719994,
-      "p_value": 5.396560584264844e-125,
-      "p_bonferroni": 5.3965605842648435e-124,
+      "ks_stat": 0.4061214313453027,
+      "p_value": 1.5596831669425776e-121,
+      "p_bonferroni": 1.5596831669425777e-120,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "personal_vlog",
       "cat_b": "fitness_wellness",
-      "ks_stat": 0.08019555249469888,
-      "p_value": 5.054937442007816e-07,
-      "p_bonferroni": 5.054937442007815e-06,
+      "ks_stat": 0.07922485818366348,
+      "p_value": 7.281219228668697e-07,
+      "p_bonferroni": 7.281219228668697e-06,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "personal_vlog",
       "cat_b": "news_current_events",
-      "ks_stat": 0.3369742679680568,
-      "p_value": 7.328574096278615e-120,
-      "p_bonferroni": 7.328574096278616e-119,
+      "ks_stat": 0.19518189884649512,
+      "p_value": 5.31176813068746e-40,
+      "p_bonferroni": 5.31176813068746e-39,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "personal_vlog",
       "cat_b": "music_entertainment",
-      "ks_stat": 0.13055783429040196,
-      "p_value": 2.6681955693974703e-12,
-      "p_bonferroni": 2.6681955693974703e-11,
+      "ks_stat": 0.10166529942575882,
+      "p_value": 1.2607575459829532e-07,
+      "p_bonferroni": 1.2607575459829533e-06,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "fitness_wellness",
       "cat_b": "news_current_events",
-      "ks_stat": 0.26101266684247687,
-      "p_value": 4.422977120932338e-73,
-      "p_bonferroni": 4.422977120932338e-72,
+      "ks_stat": 0.13548757560548189,
+      "p_value": 7.298384183010929e-20,
+      "p_bonferroni": 7.298384183010929e-19,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "fitness_wellness",
       "cat_b": "music_entertainment",
-      "ks_stat": 0.08613480938359264,
-      "p_value": 1.1341946887145971e-05,
-      "p_bonferroni": 0.00011341946887145972,
+      "ks_stat": 0.09086914461556138,
+      "p_value": 2.906432377141167e-06,
+      "p_bonferroni": 2.906432377141167e-05,
       "significant_alpha_0.05": true
     },
     {
       "cat_a": "news_current_events",
       "cat_b": "music_entertainment",
-      "ks_stat": 0.32494349667676753,
-      "p_value": 1.3300175333598116e-76,
-      "p_bonferroni": 1.3300175333598117e-75,
+      "ks_stat": 0.1543945355008287,
+      "p_value": 2.104905663564164e-17,
+      "p_bonferroni": 2.1049056635641642e-16,
       "significant_alpha_0.05": true
     }
   ]
