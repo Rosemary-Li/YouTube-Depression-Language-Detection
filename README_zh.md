@@ -360,7 +360,7 @@ Top 正向特征（`lost`、`crying`、`depression`、`anxiety`、`me`、`tears`
 
 ## 团队
 
-<!-- 在此添加成员姓名与分工 -->
+Rosemary Li · Shenghan Gao · Keith Leung · Cody Yu · Seven Zhang
 
 ---
 

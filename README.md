@@ -390,7 +390,7 @@ Results should be interpreted as measuring _the natural prevalence of depression
 
 ## Team
 
-<!-- Add names / roles here -->
+Rosemary Li · Shenghan Gao · Keith Leung · Cody Yu · Seven Zhang
 
 ---
 
