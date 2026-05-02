@@ -65,8 +65,8 @@ The analysis unit is the **comment**, not the video. A music video has no depres
 | 0 — Data collection        | `collect.py`          | API key, category list | `data/raw/videos.json`, `data/raw/comments.json`    |
 | 1 — Video analysis         | `video_analysis.py`   | `videos.json`          | `data/processed/video_features.csv`                 |
 | 2 — Comment analysis       | `comment_analysis.py` | `comments.json`        | `data/processed/comment_features.csv`               |
-| 3 — Cross-category linking | `linking.py`          | both feature CSVs      | `data/outputs/heatmap.png`, `data/outputs/tsne.png` |
-| 4 — Modeling               | `modeling.py`         | both feature CSVs      | `data/outputs/model_results.json`                   |
+| 3 — Cross-category linking | `linking.py`          | both feature CSVs      | `data/outputs/category_heatmap.png`, `data/outputs/tsne_by_category.png`, plus HDBSCAN/GMM cluster figures |
+| 4 — Modeling               | `modeling.py`         | both feature CSVs      | `data/outputs/model_results.json`, `data/outputs/model_comparison.png`, `data/outputs/confusion_matrices.png` |
 
 ---
 
@@ -188,6 +188,42 @@ Comment embeddings (`sentence-transformers/all-MiniLM-L6-v2`) are clustered usin
 - **Gaussian Mixture Models (GMM)** — soft clustering; each comment receives a probability of belonging to each cluster rather than a hard label. More appropriate for emotionally ambiguous comments. Optimal number of components selected by AIC/BIC.
 
 Both clustering results are reported and compared for interpretability.
+
+**Concrete validation produced by clustering.** Beyond serving as a sanity
+check on the rule-based pipeline, HDBSCAN surfaces two diagnostically valuable
+clusters that rule-based methods alone could not have isolated:
+
+- **Cluster 2 — the "real" depression cluster.** 63 comments, **100%
+  mental-health category**, mean composite signal **0.537**, self-disclosure
+  rate **44.4%**. Top lexicon terms are clinically specific
+  (`depression`, `psych`, `ward`, `diagnosed`, `therapy`, `medication`).
+  Sampled comments are unambiguous first-person reflections on depression.
+  This cluster is small but extremely concentrated — it confirms a genuine,
+  irreducible core of self-disclosure in the mental-health corpus,
+  independent of any rule we wrote.
+
+- **Cluster 3 — the fitness false-positive cluster.** 236 comments, **100%
+  fitness-wellness**, signal **0.133**, disclosure **12.7%**. Triggered by
+  weight-loss progress reports ("I **lost** 20 kg", "I **struggled** with this
+  routine") whose vocabulary overlaps the `exhaustion` and `hopelessness`
+  LIWC-aligned categories. Detailed in the Limitations section.
+
+**Semantic geometry between them.** In the SBERT 384-d embedding space,
+cluster 3 (fitness false positives) is the **single closest cluster** to
+cluster 2 (real depression) — cosine similarity **+0.175**, versus only
+**−0.027** for cluster 4 (ordinary fitness comments) and ≤ +0.13 for all
+other clusters. The same ranking holds in PCA-reduced and t-SNE-2D space.
+Two implications:
+
+  1. SBERT embeddings genuinely place "fitness comments that *look like*
+     depression" closer to real depression talk than to ordinary fitness
+     comments — same first-person + struggle-narrative templates, even
+     though the underlying topic differs.
+  2. A purely embedding-based search ("find comments semantically similar
+     to depression talk") **cannot** filter this contamination by itself —
+     domain / lexical filters remain necessary on top of semantic similarity.
+     This is precisely why the three layers and the clustering layer are
+     complementary: each catches what the others miss.
 
 **Dimensionality reduction and visualization**
 
@@ -343,6 +379,7 @@ designed to detect, validating the labeling pipeline from a different angle.
 
 - **Comment ≠ commenter**: the presence of depression-indicative language does not imply the commenter has depression.
 - **Sentiment ≠ depression**: negative sentiment is a necessary but not sufficient signal — the three-layer method is designed to address this, but false positives remain possible.
+- **Domain-specific lexical false positives**: depression vocabulary collides with fitness vocabulary. An HDBSCAN cluster of 236 fitness-only comments (cluster 3) — semantically dominated by weight-loss progress reports ("I **lost** 20 kg", "I **struggled** with this routine", "**tired**", "**hurt**", "**give up**") — accounts for ~27% of fitness self-disclosure flags. These are mechanically triggered by `lost / struggle / tired / hurt / give up` (which sit in our `exhaustion` and `hopelessness` LIWC-aligned categories) but are not depression-related in context. Removing this cluster drops fitness self-disclosure rate from 4.7% to ~3.5%, much closer to Vlog (2.6%) and Music (1.5%). Adjacent-domain lexical contamination should be expected wherever depression vocabulary overlaps with everyday topical vocabulary; surfacing such clusters is one of the practical uses of unsupervised clustering in this pipeline.
 - **Top-comment bias**: sorting by likes favors emotionally resonant language; quieter expressions of distress may be underrepresented.
 - **Category sampling**: the five categories were defined by the research team and do not exhaustively represent all YouTube content.
 - **No clinical ground truth**: all labels are proxies based on linguistic and behavioral signals, not clinical assessment.

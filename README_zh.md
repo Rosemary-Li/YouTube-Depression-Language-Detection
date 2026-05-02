@@ -65,8 +65,8 @@
 | 0 — 数据采集   | `collect.py`          | API 密钥、类别列表 | `data/raw/videos.json`、`data/raw/comments.json`    |
 | 1 — 视频分析   | `video_analysis.py`   | `videos.json`      | `data/processed/video_features.csv`                 |
 | 2 — 评论分析   | `comment_analysis.py` | `comments.json`    | `data/processed/comment_features.csv`               |
-| 3 — 跨类别关联 | `linking.py`          | 两份特征 CSV       | `data/outputs/heatmap.png`、`data/outputs/tsne.png` |
-| 4 — 建模       | `modeling.py`         | 两份特征 CSV       | `data/outputs/model_results.json`                   |
+| 3 — 跨类别关联 | `linking.py`          | 两份特征 CSV       | `data/outputs/category_heatmap.png`、`data/outputs/tsne_by_category.png`，以及 HDBSCAN / GMM 聚类相关图 |
+| 4 — 建模       | `modeling.py`         | 两份特征 CSV       | `data/outputs/model_results.json`、`data/outputs/model_comparison.png`、`data/outputs/confusion_matrices.png` |
 
 ---
 
@@ -188,6 +188,34 @@ python src/modeling.py
 - **高斯混合模型（GMM）** — 软聚类；每条评论以概率归属于各个簇，而非强制分入单一类别。对情绪模糊的评论更为合适。最优组件数通过 AIC/BIC 选择。
 
 两种聚类结果均报告并对比可解释性。
+
+**聚类的具体验证产物。** 除了作为规则方法的健全性检查，HDBSCAN 在嵌入空间里
+分离出两个**仅靠规则无法识别**的诊断性子群——它们一起为整套结论提供了独立
+互验：
+
+- **Cluster 2 — "真"抑郁簇。** 63 条评论，**100% mental_health 类别**，
+  平均复合信号分 **0.537**，自我披露率 **44.4%**。Top 词典命中是临床专属词
+  （`depression`、`psych`、`ward`、`diagnosed`、`therapy`、`medication`）。
+  抽样原文均为明确的第一人称抑郁反思。这个簇虽小但密度极高——它独立于
+  我们任何规则，**确认了 mental_health 语料里存在一个真实、不可还原的
+  自我披露核心**。
+
+- **Cluster 3 — fitness 假阳性簇。** 236 条评论，**100% fitness_wellness**，
+  信号分 **0.133**，披露率 **12.7%**。由"减肥进度汇报"驱动
+  （"I **lost** 20 kg"、"I **struggled** with this routine"），所用词汇
+  正好与 `exhaustion`、`hopelessness` 类目重叠。详见 Limitations 节。
+
+**两簇之间的语义几何。** 在 SBERT 384 维嵌入空间里，cluster 3（fitness 假阳性）
+是离 cluster 2（真抑郁）**最近的一个簇**——余弦相似度 **+0.175**，而 cluster 4
+（普通 fitness 评论）只有 **−0.027**，其它所有簇都 ≤ +0.13。同一排序在
+PCA 50 维与 t-SNE 2D 空间里都成立。两层含义：
+
+  1. SBERT 嵌入**真的**把"看起来像抑郁的健身评论"放在了比"普通健身评论"
+     更靠近真抑郁话语的位置——它们共享同一种第一人称 + 挣扎叙事模板，
+     哪怕底层话题不同。
+  2. 仅凭嵌入做语义搜索（"找跟抑郁评论语义相近的"）**无法**自动过滤掉这种
+     污染——领域 / 词典过滤器仍然必要。这正是三层检测 + 聚类**互补**的
+     原因：每一层都捕捉别人漏掉的东西。
 
 **降维与可视化**
 
@@ -321,6 +349,7 @@ Top 正向特征（`lost`、`crying`、`depression`、`anxiety`、`me`、`tears`
 
 - **评论 ≠ 评论者**：评论中出现抑郁指示性语言，并不意味着评论者患有抑郁症。
 - **情感 ≠ 抑郁**：负面情感是必要但不充分的信号——三层检测方法旨在解决这一问题，但误报仍有可能发生。
+- **领域特定的词典假阳性**：抑郁词典与健身词汇高度重叠。HDBSCAN 聚出一个 236 条**全部为 fitness 类**的语义同质簇（cluster 3）——内容以"减肥进度汇报"为主（"I **lost** 20 kg"、"I **struggled** with this routine"、"**tired**"、"**hurt**"、"**give up**"），占 fitness 类自我披露标签的约 27%。这些评论机械地命中了我们 `exhaustion`、`hopelessness` 子类目里的 `lost / struggle / tired / hurt / give up` 等词，但在上下文中与抑郁无关。剔除此簇后，fitness 类的自我披露率从 4.7% 降到约 3.5%，更接近 Vlog (2.6%) 和 Music (1.5%) 的水平。任何与抑郁词典在日常话题词汇上有重叠的相邻领域都应预期此类污染；让无监督聚类把它"显形"出来，正是本流水线引入聚类的实用价值之一。
 - **高赞评论偏差**：按点赞数排序会偏向情绪共鸣性语言；较安静的痛苦表达可能代表性不足。
 - **类别采样局限**：五个类别由研究团队定义，并不能穷举所有 YouTube 内容类型。
 - **无临床基准真值**：所有标签均基于语言和行为信号的代理指标，而非临床评估。
